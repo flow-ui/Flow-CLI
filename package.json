@@ -1,6 +1,6 @@
 {
   "name": "front-flow",
-  "version": "1.1.0",
+  "version": "1.1.1",
   "description": "基于gulp开发的前端自动化工作流",
   "main": "index.js",
   "scripts": {
@@ -19,13 +19,14 @@
     "browser-sync": "^2.14.0",
     "commander": "^2.9.0",
     "del": "^2.2.2",
-    "extract-zip": "^1.5.0",
+    "download-git-repo": "^0.1.2",
     "gulp": "^3.9.1",
     "gulp-autoprefixer": "^3.1.1",
     "gulp-concat": "^2.6.0",
     "gulp-imagemin": "^3.0.3",
     "gulp-include": "^2.3.1",
     "gulp-less": "^3.1.0",
-    "gulp-replace": "^0.5.4"
+    "gulp-replace": "^0.5.4",
+    "ora": "^0.3.0"
   }
 }

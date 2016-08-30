@@ -1,4 +1,6 @@
 #!/usr/bin/env node
+
+const fs = require('fs');
 const path = require('path');
 const gulp = require('gulp');
 const del = require('del');
@@ -9,9 +11,10 @@ const less = require('gulp-less');
 const autoprefixer = require('gulp-autoprefixer');
 const concat = require('gulp-concat');
 const browserSync = require('browser-sync').create();
-const extract = require('extract-zip');
-const program = require('commander');
-const projectFolder = './src';
+const download = require('download-git-repo');
+const ora = require('ora');
+
+const projectFolder = './_src';
 const distFolder = './dist';
 
 const types = {
@@ -22,16 +25,16 @@ const types = {
 	font: 'eot,svg,ttf,woff'
 };
 const paths = {
-	scriptConcat: [path.join( projectFolder, './lib/seajs/sea.js'), path.join( projectFolder, './seajs.config.js'), path.join( projectFolder, './lib/seajs/manifest.js'), path.join( projectFolder, './lib/seajs/seajs-localcache.js')],
-	scriptApp: [path.join( projectFolder, './js/*')],
-	scriptLib: [path.join( projectFolder, './lib/*')],
-	images: [path.join( projectFolder, './img/**/*.{' + types.img + '}')],
-	css: [path.join( projectFolder, './css/style.less')],
-	cssAll: [path.join( projectFolder, './css/**/*.less'), path.join( './component/**/*.less'), path.join( projectFolder, './include/**/*.less')],
-	font: [path.join( projectFolder, './font/*')],
-	html: path.join( projectFolder, './*.html'),
-	htmlAll: path.join( projectFolder, '**/*.html'),
-	include: path.join( projectFolder, './include')
+	scriptConcat: [path.join(projectFolder, './lib/seajs/sea.js'), path.join(projectFolder, './seajs.config.js'), path.join(projectFolder, './lib/seajs/manifest.js'), path.join(projectFolder, './lib/seajs/seajs-localcache.js')],
+	scriptApp: [path.join(projectFolder, './js/*')],
+	scriptLib: [path.join(projectFolder, './lib/*')],
+	images: [path.join(projectFolder, './img/**/*.{' + types.img + '}')],
+	css: [path.join(projectFolder, './css/style.less')],
+	cssAll: [path.join(projectFolder, './css/**/*.less'), path.join('./_component/**/*.less'), path.join(projectFolder, './include/**/*.less')],
+	font: [path.join(projectFolder, './font/*')],
+	html: path.join(projectFolder, './*.html'),
+	htmlAll: path.join(projectFolder, '**/*.html'),
+	include: path.join(projectFolder, './include')
 };
 const dist = {
 	lib: distFolder + '/lib',
@@ -101,7 +104,7 @@ const cssHandle = function() {
 			.pipe(includer({
 				extensions: ['css', 'less'],
 				hardFail: true,
-				includePaths: [path.join( './component'), path.join( projectFolder, './css'), path.join( projectFolder, './include')]
+				includePaths: [path.join('./_component'), path.join(projectFolder, './css'), path.join(projectFolder, './include')]
 			}))
 			.pipe(less())
 			.pipe(autoprefixer({
@@ -126,7 +129,7 @@ const htmlHandle = function() {
 			.on('end', function() {
 				gulp.src(paths.html)
 					.pipe(includer({
-						includePaths: [path.join( projectFolder, './include')]
+						includePaths: [path.join(projectFolder, './include')]
 					}))
 					.pipe(gulp.dest(dist.html))
 					.on('end', function() {
@@ -190,36 +193,41 @@ gulp.task('serve', ['watch'], function() {
 	});
 });
 
-gulp.task('default', ['build', 'serve'],function(){
+gulp.task('default', ['build', 'serve'], function() {
 	console.log('服务已启动...')
 });
-gulp.task('build', ['script', 'images', 'font', 'css', 'html'],function(){
+gulp.task('build', ['script', 'images', 'font', 'css', 'html'], function() {
 	console.log('项目构建完成！')
 });
-gulp.task('init', function(){
-	extract(path.resolve(path.join( './template.zip')), {
-		dir: './'
-	}, function(err) {
-		if (err) {
-			throw new Error(err);
-		}
+gulp.task('init', function() {
+	var DOWNLOAD_DIR = path.join(__dirname, './template.zip');
+	var spinner = ora('downloading template')
+  	spinner.start()
+	download('tower1229/front-flow-template', './', function(err) {
+		if (err) return console.log(err);
+		spinner.stop();
+		console.log('项目初始化完成！')
 	});
-	console.log('项目初始化完成！')
-});
- 
-program
-  .version('0.0.1')
-  .option('-r, --run', '监听')
-  .option('-i, --init', '初始化项目')
-  .option('-b, --build', '编译')
-  .parse(process.argv);
 
-if (program.run) {
-	gulp.run('default');
-};
-if (program.init) {
-	gulp.run('init');
-};
-if (program.build) {
-	gulp.run('build');
+});
+
+const command = process.argv.slice(2)[0];
+switch (command) {
+	case 'run':
+		gulp.run('default');
+		break;
+	case 'init':
+		gulp.run('init');
+		break;
+	case 'build':
+		gulp.run('build');
+		break;
+	default:
+		console.log(`
+命令"${command}"有误，请检查输入:
+flow run --运行开发监听服务
+flow init --初始化一个frontend框架项目
+flow build --编译打包
+			`)
+		break;
 };
