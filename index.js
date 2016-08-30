@@ -1,10 +1,4 @@
-/*
- * name: gulpfile.js
- * version: v0.1.0
- * update: build
- * date: 2016-8-19
- */
-
+#!/usr/bin/env node
 const path = require('path');
 const gulp = require('gulp');
 const del = require('del');
@@ -15,10 +9,10 @@ const less = require('gulp-less');
 const autoprefixer = require('gulp-autoprefixer');
 const concat = require('gulp-concat');
 const browserSync = require('browser-sync').create();
-const argv = require('yargs').argv;
 const extract = require('extract-zip');
-const projectFolder = 'src';
-const distFolder = 'dist';
+const program = require('commander');
+const projectFolder = './src';
+const distFolder = './dist';
 
 const types = {
 	script: 'js',
@@ -28,16 +22,16 @@ const types = {
 	font: 'eot,svg,ttf,woff'
 };
 const paths = {
-	scriptConcat: [path.join(__dirname, projectFolder, './lib/seajs/sea.js'), path.join(__dirname, projectFolder, './seajs.config.js'), path.join(__dirname, projectFolder, './lib/seajs/manifest.js'), path.join(__dirname, projectFolder, './lib/seajs/seajs-localcache.js')],
-	scriptApp: [path.join(__dirname, projectFolder, './js/*')],
-	scriptLib: [path.join(__dirname, projectFolder, './lib/*')],
-	images: [path.join(__dirname, projectFolder, './img/**/*.{' + types.img + '}')],
-	css: [path.join(__dirname, projectFolder, './css/style.less')],
-	cssAll: [path.join(__dirname, projectFolder, './css/**/*.less'), path.join(__dirname, './component/**/*.less'), path.join(__dirname, projectFolder, './include/**/*.less')],
-	font: [path.join(__dirname, projectFolder, './font/*')],
-	html: path.join(__dirname, projectFolder, './*.html'),
-	htmlAll: path.join(__dirname, projectFolder, '**/*.html'),
-	include: path.join(__dirname, projectFolder, './include')
+	scriptConcat: [path.join( projectFolder, './lib/seajs/sea.js'), path.join( projectFolder, './seajs.config.js'), path.join( projectFolder, './lib/seajs/manifest.js'), path.join( projectFolder, './lib/seajs/seajs-localcache.js')],
+	scriptApp: [path.join( projectFolder, './js/*')],
+	scriptLib: [path.join( projectFolder, './lib/*')],
+	images: [path.join( projectFolder, './img/**/*.{' + types.img + '}')],
+	css: [path.join( projectFolder, './css/style.less')],
+	cssAll: [path.join( projectFolder, './css/**/*.less'), path.join( './component/**/*.less'), path.join( projectFolder, './include/**/*.less')],
+	font: [path.join( projectFolder, './font/*')],
+	html: path.join( projectFolder, './*.html'),
+	htmlAll: path.join( projectFolder, '**/*.html'),
+	include: path.join( projectFolder, './include')
 };
 const dist = {
 	lib: distFolder + '/lib',
@@ -107,7 +101,7 @@ const cssHandle = function() {
 			.pipe(includer({
 				extensions: ['css', 'less'],
 				hardFail: true,
-				includePaths: [path.join(__dirname, './component'), path.join(__dirname, projectFolder, './css'), path.join(__dirname, projectFolder, './include')]
+				includePaths: [path.join( './component'), path.join( projectFolder, './css'), path.join( projectFolder, './include')]
 			}))
 			.pipe(less())
 			.pipe(autoprefixer({
@@ -132,7 +126,7 @@ const htmlHandle = function() {
 			.on('end', function() {
 				gulp.src(paths.html)
 					.pipe(includer({
-						includePaths: [path.join(__dirname, projectFolder, './include')]
+						includePaths: [path.join( projectFolder, './include')]
 					}))
 					.pipe(gulp.dest(dist.html))
 					.on('end', function() {
@@ -196,10 +190,14 @@ gulp.task('serve', ['watch'], function() {
 	});
 });
 
-gulp.task('default', ['build', 'serve']);
-gulp.task('build', ['script', 'images', 'font', 'css', 'html']);
+gulp.task('default', ['build', 'serve'],function(){
+	console.log('服务已启动...')
+});
+gulp.task('build', ['script', 'images', 'font', 'css', 'html'],function(){
+	console.log('项目构建完成！')
+});
 gulp.task('init', function(){
-	extract(path.resolve(path.join(__dirname, './template.zip')), {
+	extract(path.resolve(path.join( './template.zip')), {
 		dir: './'
 	}, function(err) {
 		if (err) {
@@ -208,3 +206,20 @@ gulp.task('init', function(){
 	});
 	console.log('项目初始化完成！')
 });
+ 
+program
+  .version('0.0.1')
+  .option('-r, --run', '监听')
+  .option('-i, --init', '初始化项目')
+  .option('-b, --build', '编译')
+  .parse(process.argv);
+
+if (program.run) {
+	gulp.run('default');
+};
+if (program.init) {
+	gulp.run('init');
+};
+if (program.build) {
+	gulp.run('build');
+};

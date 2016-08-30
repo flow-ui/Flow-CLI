@@ -12,8 +12,12 @@
     "type": "git",
     "url": "https://git.oschina.net/tower1229/front-flow.git"
   },
+  "bin": {
+    "flow": "./index.js"
+  },
   "dependencies": {
     "browser-sync": "^2.14.0",
+    "commander": "^2.9.0",
     "del": "^2.2.2",
     "extract-zip": "^1.5.0",
     "gulp": "^3.9.1",
