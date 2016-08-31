@@ -1,6 +1,6 @@
 #front-flow-cli
 
-基于frontend框架的前端自动化工具
+基于[frontend框架](http://git.oschina.net/tower1229/frontend)的前端自动化工具
 
 ##功能
 
