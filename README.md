@@ -21,15 +21,15 @@
 
 ###flow init
 
-下载[项目模板](https://github.com/tower1229/front-flow-template)到将当前目录
+在当前目录生成一个空白[front-flow](https://github.com/tower1229/front-flow-template)项目
 
 ###flow run
 
-启动localhost:3000端口，并监听文件修改，即时编译并刷新浏览器
+监听当前项目文件修改，并启动localhost:3000端口，实时编译并刷新浏览器
 
 ###flow build
 
-编译当前项目至`./dist`文件夹
+编译当前项目，默认至`./dist`文件夹
 
 ##开发指南
 
