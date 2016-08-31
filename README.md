@@ -19,12 +19,6 @@
 
 ##文档
 
-1. 初始化项目：`flow init`
-2. 启动开发服务：`flow run`
-3. 打包编译：`flow build`
-
---------------------------
-
 ###flow init
 
 下载[项目模板](https://github.com/tower1229/front-flow-template)到将当前目录
@@ -36,3 +30,11 @@
 ###flow build
 
 编译当前项目至`./dist`文件夹
+
+##开发指南
+
+[官方网站](http://zangtao.org/projects/front-flow-cli/)
+
+##License 
+
+MIT
