@@ -1,16 +1,8 @@
-##front-flow-cli
+#front-flow-cli
 
-为front-flow项目开发的命令行工具
+基于frontend框架的前端自动化工具
 
-###使用
-
-1. 安装nodejs
-2. 全局安装：`npm install front-flow -g`
-3. 初始化项目：`flow init`
-4. 启动开发服务：`flow run`
-5. 打包编译：`flow build`
-
-###功能
+##功能
 
 1. 快速初始化front-flow项目
 2. 开发中静态资源合并
@@ -19,3 +11,28 @@
 5. 文件监听即时刷新
 6. 图片压缩
 7. css autoprefixer
+
+##安装
+
+1. 安装nodejs
+2. npm安装：`npm install front-flow-cli -g`
+
+##文档
+
+1. 初始化项目：`flow init`
+2. 启动开发服务：`flow run`
+3. 打包编译：`flow build`
+
+--------------------------
+
+###flow init
+
+下载[项目模板](https://github.com/tower1229/front-flow-template)到将当前目录
+
+###flow run
+
+启动localhost:3000端口，并监听文件修改，即时编译并刷新浏览器
+
+###flow build
+
+编译当前项目至`./dist`文件夹
