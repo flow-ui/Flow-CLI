@@ -14,7 +14,7 @@
 
 ##安装
 
-1. 安装nodejs
+1. 安装nodejs(>=6.5.0)
 2. npm安装：`npm install front-flow-cli -g`
 
 ##文档
