@@ -21,7 +21,7 @@
 
 ###flow init
 
-在当前目录生成一个空白[front-flow](https://github.com/tower1229/front-flow-template)项目
+在当前目录初始化一个[front-flow](https://github.com/tower1229/front-flow-template)项目
 
 ###flow run
 
