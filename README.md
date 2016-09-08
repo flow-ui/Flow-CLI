@@ -2,6 +2,9 @@
 
 基于[frontend框架](http://git.oschina.net/tower1229/frontend)的前端自动化工具
 
+[![DUB](https://img.shields.io/badge/npm-v1.1.0-blue.svg?maxAge=2592000)]() [![DUB](https://img.shields.io/badge/nodejs%20support-v6.5.0-green.svg?maxAge=2592000)]() [![Website](https://img.shields.io/website-up-down-green-red/http/shields.io.svg?maxAge=2592000)](http://zangtao.org/projects/front-flow-cli/) [![DUB](https://img.shields.io/dub/l/vibe-d.svg?maxAge=2592000)]()
+
+
 ##功能
 
 1. 自动初始化项目
@@ -17,7 +20,7 @@
 1. 安装nodejs(>=6.5.0)
 2. npm安装：`npm install front-flow-cli -g`
 
-##文档
+##使用
 
 ###flow init
 
@@ -31,7 +34,7 @@
 
 编译当前项目，默认至`./dist`文件夹
 
-##开发指南
+##文档
 
 [官方网站](http://zangtao.org/projects/front-flow-cli/)
 
