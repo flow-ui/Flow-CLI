@@ -124,14 +124,14 @@ const htmlHandle = function() {
 		force: true
 	}).then(function() {
 		return gulp.src(paths.include + '/link/*.html')
-			.pipe(replace('__folder', '/' + distFolder))
+			.pipe(replace('__folder', path.normalize('/' + distFolder)))
 			.pipe(gulp.dest(projectFolder + '/include'))
 			.on('end', function() {
 				gulp.src(paths.html)
 					.pipe(includer({
 						includePaths: [path.join(projectFolder, './include')]
 					}))
-					.pipe(replace('__folder', '/' + distFolder))
+					.pipe(replace('__folder', path.normalize('/' + distFolder)))
 					.pipe(gulp.dest(dist.html))
 					.on('end', function() {
 						del(paths.include + '/*.html');
