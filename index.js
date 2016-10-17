@@ -108,7 +108,7 @@ const cssHandle = function() {
 			}))
 			.pipe(less())
 			.pipe(autoprefixer({
-				browsers: ['last 3 versions'],
+				browsers: ['last 2 versions'],
 				cascade: false
 			}))
 			.pipe(gulp.dest(dist.css))
@@ -131,6 +131,7 @@ const htmlHandle = function() {
 					.pipe(includer({
 						includePaths: [path.join(projectFolder, './include')]
 					}))
+					.pipe(replace('__folder', '/' + distFolder))
 					.pipe(gulp.dest(dist.html))
 					.on('end', function() {
 						del(paths.include + '/*.html');
