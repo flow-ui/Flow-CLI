@@ -15,7 +15,7 @@ const download = require('download-git-repo');
 const ora = require('ora');
 
 const projectFolder = './_src';
-const distFolder = './dist';
+const distFolder = path.join('./dist');
 
 const types = {
 	script: 'js',
@@ -37,17 +37,17 @@ const paths = {
 	include: path.join(projectFolder, './include')
 };
 const dist = {
-	lib: distFolder + '/lib',
-	js: distFolder + '/js',
-	css: distFolder + '/css',
-	font: distFolder + '/font',
-	img: distFolder + '/img',
-	html: distFolder + ''
+	lib: path.join(distFolder, './lib'),
+	js: path.join(distFolder, './js'),
+	css: path.join(distFolder, './css'),
+	font: path.join(distFolder, './font'),
+	img: path.join(distFolder, './img'),
+	html: distFolder
 };
 
 let reload;
 
-const scriptLibHandle = function() {
+const scriptLib = function(callback) {
 	del(dist.lib, {
 		force: true
 	}).then(function() {
@@ -58,45 +58,71 @@ const scriptLibHandle = function() {
 			.pipe(replace('__folder', '/' + distFolder))
 			.pipe(gulp.dest(dist.lib))
 			.on('end', function() {
-				reload && reload()
+				if (typeof(callback) === 'function') {
+					callback();
+				}
 			});
 	});
 };
-gulp.task('scriptLib', scriptLibHandle);
 
-const scriptAppHandle = function() {
+const scriptApp = function(callback) {
 	del(dist.js, {
 		force: true
 	}).then(function() {
 		return gulp.src(paths.scriptApp)
 			.pipe(gulp.dest(dist.js))
 			.on('end', function() {
-				reload && reload()
+				if (typeof(callback) === 'function') {
+					callback();
+				}
 			});
 	});
 };
-gulp.task('scriptApp', scriptAppHandle);
 
-gulp.task('script', ['scriptLib', 'scriptApp']);
+let script = function(callback) {
+	var got = 0,
+		todoList = script.prototype.todoList,
+		resolve = function() {
+			got++;
+			if (got >= todoList.length && typeof(callback) === 'function') {
+				callback();
+				got = null;
+				resolve = null;
+				todoList = null;
+			}
+		};
+	script.prototype.todoList.forEach(function(item, index) {
+		item(resolve);
+	});
+};
+script.prototype.todoList = [scriptLib, scriptApp];
 
-const imageHandle = function() {
+const images = function(callback) {
 	return gulp.src(paths.images)
 		.pipe(imagemin())
-		.pipe(gulp.dest(dist.img));
+		.pipe(gulp.dest(dist.img))
+		.on('end', function() {
+			if (typeof(callback) === 'function') {
+				callback();
+			}
+		});
 };
-gulp.task('images', imageHandle);
 
-const fontHandle = function() {
+const font = function(callback) {
 	del(dist.font, {
 		force: true
 	}).then(function() {
 		return gulp.src(paths.font)
-			.pipe(gulp.dest(dist.font));
-	})
+			.pipe(gulp.dest(dist.font))
+			.on('end', function() {
+				if (typeof(callback) === 'function') {
+					callback();
+				}
+			});
+	});
 };
-gulp.task('font', fontHandle);
 
-const cssHandle = function() {
+const css = function(callback) {
 	del(dist.css, {
 		force: true
 	}).then(function() {
@@ -113,74 +139,129 @@ const cssHandle = function() {
 			}))
 			.pipe(gulp.dest(dist.css))
 			.on('end', function() {
-				reload && reload()
+				if (typeof(callback) === 'function') {
+					callback();
+				}
 			});
 	});
 };
-gulp.task('css', cssHandle);
 
-const htmlHandle = function() {
-	del(dist.html + '/*.html', {
-		force: true
-	}).then(function() {
-		return gulp.src(paths.include + '/link/*.html')
-			.pipe(replace('__folder', path.normalize('/' + distFolder)))
-			.pipe(gulp.dest(projectFolder + '/include'))
-			.on('end', function() {
-				gulp.src(paths.html)
-					.pipe(includer({
-						includePaths: [path.join(projectFolder, './include')]
-					}))
-					.pipe(replace('__folder', path.normalize('/' + distFolder)))
-					.pipe(gulp.dest(dist.html))
-					.on('end', function() {
-						del(paths.include + '/*.html');
-						reload && reload()
-					});
-			})
-	});
+const html = function(callback) {
+	gulp.src(paths.include + '/link/*.html')
+		.pipe(replace('__folder', path.normalize('/' + distFolder)))
+		.pipe(gulp.dest(projectFolder + '/include'))
+		.on('end', function() {
+			gulp.src(paths.html)
+				.pipe(includer({
+					includePaths: [path.join(projectFolder, './include')]
+				}))
+				.pipe(replace('__folder', path.normalize('/' + distFolder)))
+				.pipe(gulp.dest(dist.html))
+				.on('end', function() {
+					del(paths.include + '/*.html');
+					if (typeof(callback) === 'function') {
+						callback();
+					}
+				});
+		});
+	gulp.src(path.join(projectFolder, './*.ico'))
+		.pipe(gulp.dest(dist.html));
 };
-gulp.task('html', htmlHandle);
 
-gulp.task('watch', function() {
-	let watcher = gulp.watch(projectFolder + '/**/*');
-	watcher.on('change', function(event) {
-		let ext = event.path.match(/.*\.{1}([^.]*)$/)[1];
-		for (let key in types) {
-			if (types.hasOwnProperty(key)) {
-				if (types[key].indexOf(ext) > -1) {
-					ext = key;
-					break;
-				}
+const watchHandle = function(watchEvent) {
+	const file = watchEvent.path;
+	const type = watchEvent.type;
+	let ext = file.match(/.*\.{1}([^.]*)$/)[1];
+	for (let key in types) {
+		if (types.hasOwnProperty(key)) {
+			if (types[key].indexOf(ext) > -1) {
+				ext = key;
+				break;
 			}
-		};
-		switch (ext) {
-			case 'script':
-				if (event.path.indexOf('\\lib\\') > -1) {
-					scriptLibHandle()
-				} else if (event.path.indexOf('\\js\\') > -1) {
-					scriptAppHandle()
-				} else {
-					console.log('script 未命中:' + event.path)
-				};
-				break;
-			case 'img':
-				imageHandle()
-				break;
-			case 'css':
-				cssHandle()
-				break;
-			case 'font':
-				fontHandle()
-				break;
-			case 'html':
-				htmlHandle()
-				break;
 		}
-	});
-});
+	}
+	switch (ext) {
+		case 'script':
+			if (file.indexOf('\\lib\\') > -1 || file.indexOf('seajs.config') > -1) {
+				scriptLib(type === 'added' ? null : reload);
+			} else if (file.indexOf('\\js\\') > -1) {
+				if (type === 'deleted') {
+					let tmp = file.replace(/_src/, 'dist');
+					del([tmp], {
+						force: true
+					}).then(function() {
+						console.log(tmp + '已删除');
+					});
+				} else {
+					scriptApp(type === 'added' ? null : reload);
+				}
+			} else if (type === 'changed' && typeof reload === 'function') {
+				reload();
+			} else {
+				console.log('script 未命中:' + file);
+			}
+			break;
+		case 'img':
+			if (type === 'deleted') {
+				let tmp = file.replace(/_src/, 'dist');
+				del([tmp], {
+					force: true
+				}).then(function() {
+					console.log(tmp + '已删除');
+				});
+			} else {
+				images(type === 'added' ? null : reload);
+			}
+			break;
+		case 'css':
+			if (type === 'deleted') {
+				let tmp = file.replace(/_src/, 'dist');
+				del([tmp], {
+					force: true
+				}).then(function() {
+					console.log(tmp + '已删除');
+				});
+			} else {
+				css(type === 'added' ? null : reload);
+			}
+			break;
+		case 'font':
+			if (type === 'deleted') {
+				let tmp = file.replace(/_src/, 'dist');
+				del([tmp], {
+					force: true
+				}).then(function() {
+					console.log(tmp + '已删除');
+				});
+			} else {
+				font(type === 'added' ? null : reload);
+			}
+			break;
+		case 'html':
+			if (type === 'deleted') {
+				let tmp = file.replace(/_src/, 'dist');
+				del([tmp], {
+					force: true
+				}).then(function() {
+					console.log(tmp + '已删除');
+				});
+			} else {
+				html(type === 'added' ? null : reload);
+			}
+			break;
+		default:
+			console.log(file+'不在监听范围');
+	}
+};
 
-gulp.task('serve', ['watch'], function() {
+const watch = function() {
+	let watcher = gulp.watch(projectFolder + '/**/*');
+	watcher.on('change', watchHandle);
+	watcher.on('add', watchHandle);
+	watcher.on('unlink', watchHandle);
+};
+
+let serve = function(callback) {
 	browserSync.init({
 		server: {
 			baseDir: './',
@@ -191,37 +272,71 @@ gulp.task('serve', ['watch'], function() {
 		port: 3000
 	}, function() {
 		reload = browserSync.reload;
+		console.log('服务已启动...');
+		if (typeof(callback) === 'function') {
+			callback();
+		}
 	});
-});
+};
 
-gulp.task('default', ['build', 'serve'], function() {
-	console.log('服务已启动...')
-});
-gulp.task('build', ['script', 'images', 'font', 'css', 'html'], function() {
-	console.log('项目构建完成！')
-});
-gulp.task('init', function() {
-	var DOWNLOAD_DIR = path.join(__dirname, './template.zip');
-	var spinner = ora('downloading template')
-  	spinner.start()
+let build = function(callback) {
+	var got = 0,
+		todoList = build.prototype.todoList,
+		resolve = function() {
+			got++;
+			if (got >= todoList.length && typeof(callback) === 'function') {
+				console.log('项目构建完成！');
+				callback();
+				got = null;
+				resolve = null;
+				todoList = null;
+			}
+		};
+	build.prototype.todoList.forEach(function(item, index) {
+		item(resolve);
+	});
+};
+build.prototype.todoList = [script, images, font, css, html];
+
+let run = function(callback) {
+	var got = 0,
+		todoList = run.prototype.todoList,
+		resolve = function() {
+			got++;
+			if (got >= todoList.length && typeof(callback) === 'function') {
+				callback();
+				got = null;
+				resolve = null;
+				todoList = null;
+			}
+		};
+	run.prototype.todoList.forEach(function(item, index) {
+		item(resolve);
+	});
+};
+run.prototype.todoList = [build, serve];
+
+
+const init = function() {
+	var spinner = ora('downloading template');
+	spinner.start();
 	download('tower1229/front-flow-template', './', function(err) {
 		if (err) return console.log(err);
 		spinner.stop();
-		console.log('项目初始化完成！')
+		console.log('项目初始化完成！');
 	});
-
-});
+};
 
 const command = process.argv.slice(2)[0];
 switch (command) {
 	case 'run':
-		gulp.run('default');
+		run(watch);
 		break;
 	case 'init':
-		gulp.run('init');
+		init();
 		break;
 	case 'build':
-		gulp.run('build');
+		build();
 		break;
 	default:
 		console.log(`
@@ -229,6 +344,6 @@ switch (command) {
 flow run --运行开发监听服务
 flow init --初始化一个frontend框架项目
 flow build --编译打包
-			`)
+			`);
 		break;
-};
+}
