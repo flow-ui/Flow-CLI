@@ -1,19 +1,18 @@
 #front-flow-cli
 
-基于[frontend框架](http://git.oschina.net/tower1229/frontend)的前端自动化工具
+为front-flow项目开发的命令行工具
 
 [![DUB](https://img.shields.io/badge/npm-v1.1.0-blue.svg?maxAge=2592000)]() [![DUB](https://img.shields.io/badge/nodejs%20support-v6.5.0-green.svg?maxAge=2592000)]() [![Website](https://img.shields.io/website-up-down-green-red/http/shields.io.svg?maxAge=2592000)](http://zangtao.org/projects/front-flow-cli/) [![DUB](https://img.shields.io/dub/l/vibe-d.svg?maxAge=2592000)]()
 
 
 ##功能
 
-1. 自动初始化项目
+1. 一键初始化、构建或启动开发环境
 2. 静态资源合并
-3. Less编译
+3. 支持less、compress、autoprefixer
 4. 前端模板引入
-5. 文件监听即时刷新
+5. 编辑即时刷新
 6. 图片压缩
-7. css autoprefixer
 
 ##安装
 
