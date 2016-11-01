@@ -14,9 +14,6 @@ const download = require('download-git-repo');
 const ora = require('ora');
 const chokidar = require('chokidar');
 
-const projectFolder = './_src';
-const distFolder = path.join('./dist');
-
 const types = {
 	script: 'js',
 	css: 'css,less',
@@ -25,25 +22,39 @@ const types = {
 	font: 'eot,svg,ttf,woff'
 };
 
-const paths = {
-	scriptConcat: [path.join(projectFolder, './lib/seajs/sea.js'), path.join(projectFolder, './seajs.config.js'), path.join(projectFolder, './lib/seajs/manifest.js'), path.join(projectFolder, './lib/seajs/seajs-localcache.js')],
-	scriptApp: [path.join(projectFolder, './js/*')],
-	scriptLib: [path.join(projectFolder, './lib/*')],
-	images: [path.join(projectFolder, './img/**/*.{' + types.img + '}')],
-	css: [path.join(projectFolder, './css/style.less')],
-	cssAll: [path.join(projectFolder, './css/**/*.less'), path.join('./_component/**/*.less'), path.join(projectFolder, './include/**/*.less')],
-	font: [path.join(projectFolder, './font/*')],
-	html: path.join(projectFolder, './*.html'),
-	htmlAll: path.join(projectFolder, '**/*.html'),
-	include: path.join(projectFolder, './include')
-};
-const dist = {
-	lib: path.join(distFolder, './lib'),
-	js: path.join(distFolder, './js'),
-	css: path.join(distFolder, './css'),
-	font: path.join(distFolder, './font'),
-	img: path.join(distFolder, './img'),
-	html: distFolder
+let projectFolder;
+let distFolder;
+let paths;
+let dist;
+
+const getPaths = function(sourceDir){
+	if(sourceDir){
+		projectFolder = sourceDir;
+		distFolder = path.join('./dist_'+projectFolder);
+	}else{
+		projectFolder = './_src';
+		distFolder = path.join('./dist');
+	}
+	paths = {
+		scriptConcat: [path.join(projectFolder, './lib/seajs/sea.js'), path.join(projectFolder, './seajs.config.js'), path.join(projectFolder, './lib/seajs/manifest.js'), path.join(projectFolder, './lib/seajs/seajs-localcache.js')],
+		scriptApp: [path.join(projectFolder, './js/*')],
+		scriptLib: [path.join(projectFolder, './lib/*')],
+		images: [path.join(projectFolder, './img/**/*.{' + types.img + '}')],
+		css: [path.join(projectFolder, './css/style.less')],
+		cssAll: [path.join(projectFolder, './css/**/*.less'), path.join('./_component/**/*.less'), path.join(projectFolder, './include/**/*.less')],
+		font: [path.join(projectFolder, './font/*')],
+		html: path.join(projectFolder, './*.html'),
+		htmlAll: path.join(projectFolder, '**/*.html'),
+		include: path.join(projectFolder, './include')
+	};
+	dist = {
+		lib: path.join(distFolder, './lib'),
+		js: path.join(distFolder, './js'),
+		css: path.join(distFolder, './css'),
+		font: path.join(distFolder, './font'),
+		img: path.join(distFolder, './img'),
+		html: distFolder
+	};
 };
 
 let reload;
@@ -90,7 +101,7 @@ let script = function(callback) {
 };
 script.prototype.todoList = [scriptLib, scriptApp];
 
-const images = function(callback) {
+let images = function(callback) {
 	gulp.src(paths.images)
 		.pipe(imagemin())
 		.pipe(gulp.dest(dist.img))
@@ -101,7 +112,7 @@ const images = function(callback) {
 		});
 };
 
-const font = function(callback) {
+let font = function(callback) {
 	del(dist.font, {
 		force: true
 	}).then(function() {
@@ -115,7 +126,7 @@ const font = function(callback) {
 	});
 };
 
-const css = function(callback) {
+let css = function(callback) {
 	gulp.src(paths.css)
 		.pipe(includer({
 			extensions: ['css', 'less'],
@@ -134,7 +145,7 @@ const css = function(callback) {
 		});
 };
 
-const html = function(callback) {
+let html = function(callback) {
 	gulp.src(paths.html)
 		.pipe(includer({
 			includePaths: [path.join(projectFolder, './include')]
@@ -150,7 +161,7 @@ const html = function(callback) {
 		.pipe(gulp.dest(dist.html));
 };
 
-const watchHandle = function(type, file) {
+let watchHandle = function(type, file) {
 	let ext = file.match(/.*\.{1}([^.]*)$/)[1];
 	for (let key in types) {
 		if (types.hasOwnProperty(key)) {
@@ -320,27 +331,30 @@ const init = function() {
 const program = require('commander');
 const pkg = require('../package.json');
 
-program.version(pkg.version);
+program
+	.version(pkg.version)
+	.usage('flow [command] <option>');
 
 program
 	.command('init')
-	.description('初始化一个frontend框架项目')
+	.description('初始化一个front-flow模板项目')
 	.action(function(project) {
 		init();
 	});
 
 program
-	.command('run')
-	.description('运行开发监听服务')
-	.option('-p, --port [port]', 'listening port')
-	.action(function(port) {
+	.command('run [dir]')
+	.description('运行开发服务')
+	.action(function(dir) {
+		getPaths(dir);
 		run(watcher);
 	});
 
 program
-	.command('build')
+	.command('build [dir]')
 	.description('编译打包')
-	.action(function(port) {
+	.action(function(dir) {
+		getPaths(dir);
 		build();
 	});
 
