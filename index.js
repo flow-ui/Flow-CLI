@@ -8,7 +8,8 @@ const replace = require('gulp-replace');
 const includer = require('gulp-include');
 const imagemin = require('gulp-imagemin');
 const less = require('gulp-less');
-const autoprefixer = require('gulp-autoprefixer');
+const LessAutoprefix = require('less-plugin-autoprefix');
+const autoprefix = new LessAutoprefix();
 const concat = require('gulp-concat');
 const browserSync = require('browser-sync').create();
 const download = require('download-git-repo');
@@ -132,11 +133,10 @@ const css = function(callback) {
 				hardFail: true,
 				includePaths: [path.join('./_component'), path.join(projectFolder, './css'), path.join(projectFolder, './include')]
 			}))
-			.pipe(less())
-			.pipe(autoprefixer({
-				browsers: ['last 2 versions'],
-				cascade: false
-			}))
+			.pipe(less({
+					plugins: [autoprefix],
+					compress:true
+				}))
 			.pipe(gulp.dest(dist.css))
 			.on('end', function() {
 				if (typeof(callback) === 'function') {
@@ -315,7 +315,6 @@ let run = function(callback) {
 	});
 };
 run.prototype.todoList = [build, serve];
-
 
 const init = function() {
 	var spinner = ora('downloading template');
