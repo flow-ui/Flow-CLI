@@ -2,8 +2,8 @@
 
 const fs = require('fs');
 const path = require('path');
-const gulp = require('gulp');
 const del = require('del');
+const gulp = require('gulp');
 const replace = require('gulp-replace');
 const includer = require('gulp-include');
 const imagemin = require('gulp-imagemin');
@@ -14,7 +14,7 @@ const concat = require('gulp-concat');
 const browserSync = require('browser-sync').create();
 const download = require('download-git-repo');
 const ora = require('ora');
-
+const chokidar = require('chokidar');
 const projectFolder = './_src';
 const distFolder = path.join('./dist');
 
@@ -134,9 +134,9 @@ const css = function(callback) {
 				includePaths: [path.join('./_component'), path.join(projectFolder, './css'), path.join(projectFolder, './include')]
 			}))
 			.pipe(less({
-					plugins: [autoprefix],
-					compress:true
-				}))
+				plugins: [autoprefix],
+				compress: true
+			}))
 			.pipe(gulp.dest(dist.css))
 			.on('end', function() {
 				if (typeof(callback) === 'function') {
@@ -147,30 +147,22 @@ const css = function(callback) {
 };
 
 const html = function(callback) {
-	gulp.src(paths.include + '/link/*.html')
-		.pipe(replace('__folder', path.normalize('/' + distFolder)))
-		.pipe(gulp.dest(projectFolder + '/include'))
+	gulp.src(paths.html)
+		.pipe(includer({
+			includePaths: [path.join(projectFolder, './include')]
+		}))
+		.pipe(replace('__folder', '/' + distFolder))
+		.pipe(gulp.dest(dist.html))
 		.on('end', function() {
-			gulp.src(paths.html)
-				.pipe(includer({
-					includePaths: [path.join(projectFolder, './include')]
-				}))
-				.pipe(replace('__folder', path.normalize('/' + distFolder)))
-				.pipe(gulp.dest(dist.html))
-				.on('end', function() {
-					del(paths.include + '/*.html');
-					if (typeof(callback) === 'function') {
-						callback();
-					}
-				});
+			if (typeof(callback) === 'function') {
+				callback();
+			}
 		});
 	gulp.src(path.join(projectFolder, './*.ico'))
 		.pipe(gulp.dest(dist.html));
 };
 
-const watchHandle = function(watchEvent) {
-	const file = watchEvent.path;
-	const type = watchEvent.type;
+const watchHandle = function(type, file) {
 	let ext = file.match(/.*\.{1}([^.]*)$/)[1];
 	for (let key in types) {
 		if (types.hasOwnProperty(key)) {
@@ -183,9 +175,9 @@ const watchHandle = function(watchEvent) {
 	switch (ext) {
 		case 'script':
 			if (file.indexOf('\\lib\\') > -1 || file.indexOf('seajs.config') > -1) {
-				scriptLib(type === 'added' ? null : reload);
+				scriptLib(type === 'add' ? null : reload);
 			} else if (file.indexOf('\\js\\') > -1) {
-				if (type === 'deleted') {
+				if (type === 'unlink') {
 					let tmp = file.replace(/_src/, 'dist');
 					del([tmp], {
 						force: true
@@ -193,16 +185,16 @@ const watchHandle = function(watchEvent) {
 						console.log(tmp + '已删除');
 					});
 				} else {
-					scriptApp(type === 'added' ? null : reload);
+					scriptApp(type === 'add' ? null : reload);
 				}
-			} else if (type === 'changed' && typeof reload === 'function') {
+			} else if (type === 'change' && typeof reload === 'function') {
 				reload();
 			} else {
 				console.log('script 未命中:' + file);
 			}
 			break;
 		case 'img':
-			if (type === 'deleted') {
+			if (type === 'unlink') {
 				let tmp = file.replace(/_src/, 'dist');
 				del([tmp], {
 					force: true
@@ -210,11 +202,11 @@ const watchHandle = function(watchEvent) {
 					console.log(tmp + '已删除');
 				});
 			} else {
-				images(type === 'added' ? null : reload);
+				images(type === 'add' ? null : reload);
 			}
 			break;
 		case 'css':
-			if (type === 'deleted') {
+			if (type === 'unlink') {
 				let tmp = file.replace(/_src/, 'dist');
 				del([tmp], {
 					force: true
@@ -222,11 +214,11 @@ const watchHandle = function(watchEvent) {
 					console.log(tmp + '已删除');
 				});
 			} else {
-				css(type === 'added' ? null : reload);
+				css(type === 'add' ? null : reload);
 			}
 			break;
 		case 'font':
-			if (type === 'deleted') {
+			if (type === 'unlink') {
 				let tmp = file.replace(/_src/, 'dist');
 				del([tmp], {
 					force: true
@@ -234,11 +226,11 @@ const watchHandle = function(watchEvent) {
 					console.log(tmp + '已删除');
 				});
 			} else {
-				font(type === 'added' ? null : reload);
+				font(type === 'add' ? null : reload);
 			}
 			break;
 		case 'html':
-			if (type === 'deleted') {
+			if (type === 'unlink') {
 				let tmp = file.replace(/_src/, 'dist');
 				del([tmp], {
 					force: true
@@ -246,19 +238,17 @@ const watchHandle = function(watchEvent) {
 					console.log(tmp + '已删除');
 				});
 			} else {
-				html(type === 'added' ? null : reload);
+				html(type === 'add' ? null : reload);
 			}
 			break;
 		default:
-			console.log(file+'不在监听范围');
+			console.log(file + '不在监听范围');
 	}
 };
-
-const watch = function() {
-	let watcher = gulp.watch(projectFolder + '/**/*');
-	watcher.on('change', watchHandle);
-	watcher.on('add', watchHandle);
-	watcher.on('unlink', watchHandle);
+const watch = chokidar.watch('.', {ignored: distFolder});
+const watcher = function() {
+	//TOOD 排除dist
+	watch.on('all', watchHandle);
 };
 
 let serve = function(callback) {
@@ -329,7 +319,7 @@ const init = function() {
 const command = process.argv.slice(2)[0];
 switch (command) {
 	case 'run':
-		run(watch);
+		run(watcher);
 		break;
 	case 'init':
 		init();

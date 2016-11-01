@@ -1,6 +1,6 @@
 {
   "name": "front-flow-cli",
-  "version": "1.1.4",
+  "version": "1.1.5",
   "description": "为front-flow项目开发的命令行工具",
   "keywords": [
     "frontend",
@@ -21,6 +21,7 @@
   },
   "dependencies": {
     "browser-sync": "^2.14.0",
+    "chokidar": "^1.6.1",
     "del": "^2.2.2",
     "download-git-repo": "^0.1.2",
     "gulp": "^3.9.1",
