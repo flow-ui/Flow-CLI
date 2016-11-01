@@ -49,35 +49,27 @@ const dist = {
 let reload;
 
 const scriptLib = function(callback) {
-	del(dist.lib, {
-		force: true
-	}).then(function() {
-		gulp.src(paths.scriptLib)
-			.pipe(gulp.dest(dist.lib));
-		return gulp.src(paths.scriptConcat)
-			.pipe(concat('sea.js'))
-			.pipe(replace('__folder', '/' + distFolder))
-			.pipe(gulp.dest(dist.lib))
-			.on('end', function() {
-				if (typeof(callback) === 'function') {
-					callback();
-				}
-			});
-	});
+	gulp.src(paths.scriptLib)
+		.pipe(gulp.dest(dist.lib));
+	gulp.src(paths.scriptConcat)
+		.pipe(concat('sea.js'))
+		.pipe(replace('__folder', '/' + distFolder))
+		.pipe(gulp.dest(dist.lib))
+		.on('end', function() {
+			if (typeof(callback) === 'function') {
+				callback();
+			}
+		});
 };
 
 const scriptApp = function(callback) {
-	del(dist.js, {
-		force: true
-	}).then(function() {
-		return gulp.src(paths.scriptApp)
-			.pipe(gulp.dest(dist.js))
-			.on('end', function() {
-				if (typeof(callback) === 'function') {
-					callback();
-				}
-			});
-	});
+	gulp.src(paths.scriptApp)
+		.pipe(gulp.dest(dist.js))
+		.on('end', function() {
+			if (typeof(callback) === 'function') {
+				callback();
+			}
+		});
 };
 
 let script = function(callback) {
@@ -99,7 +91,7 @@ let script = function(callback) {
 script.prototype.todoList = [scriptLib, scriptApp];
 
 const images = function(callback) {
-	return gulp.src(paths.images)
+	gulp.src(paths.images)
 		.pipe(imagemin())
 		.pipe(gulp.dest(dist.img))
 		.on('end', function() {
@@ -124,26 +116,22 @@ const font = function(callback) {
 };
 
 const css = function(callback) {
-	del(dist.css, {
-		force: true
-	}).then(function() {
-		return gulp.src(paths.css)
-			.pipe(includer({
-				extensions: ['css', 'less'],
-				hardFail: true,
-				includePaths: [path.join('./_component'), path.join(projectFolder, './css'), path.join(projectFolder, './include')]
-			}))
-			.pipe(less({
-				plugins: [autoprefix],
-				compress: true
-			}))
-			.pipe(gulp.dest(dist.css))
-			.on('end', function() {
-				if (typeof(callback) === 'function') {
-					callback();
-				}
-			});
-	});
+	gulp.src(paths.css)
+		.pipe(includer({
+			extensions: ['css', 'less'],
+			hardFail: true,
+			includePaths: [path.join('./_component'), path.join(projectFolder, './css'), path.join(projectFolder, './include')]
+		}))
+		.pipe(less({
+			plugins: [autoprefix],
+			compress: true
+		}))
+		.pipe(gulp.dest(dist.css))
+		.on('end', function() {
+			if (typeof(callback) === 'function') {
+				callback();
+			}
+		});
 };
 
 const html = function(callback) {
@@ -246,7 +234,13 @@ const watchHandle = function(type, file) {
 	}
 };
 
-const watch = chokidar.watch(['./_component','./_src','./modules'], {ignored: /[\/\\]\.|(\.[^\.]*TMP[^\.]*$)/});
+const watch = chokidar.watch(['./_component', './_src', './modules'], {
+	ignored: /[\/\\]\.|(\.[^\.]*TMP[^\.]*$)/,
+	awaitWriteFinish: {
+		stabilityThreshold: 300,
+		pollInterval: 300
+	}
+});
 
 const watcher = function() {
 	watch.on('all', watchHandle);
@@ -279,9 +273,9 @@ let build = function(callback) {
 				got = null;
 				resolve = null;
 				todoList = null;
-				if(typeof(callback) === 'function'){
+				if (typeof(callback) === 'function') {
 					callback();
-				}else{
+				} else {
 					console.log('项目构建完成！');
 					process.exit();
 				}
@@ -324,30 +318,30 @@ const init = function() {
 };
 
 const program = require('commander');
-const pkg     = require('../package.json');
+const pkg = require('../package.json');
 
 program.version(pkg.version);
 
- program
-  .command('init')
-  .description('初始化一个frontend框架项目')
-  .action(function(project){
-      init();
-  });
+program
+	.command('init')
+	.description('初始化一个frontend框架项目')
+	.action(function(project) {
+		init();
+	});
 
 program
-    .command('run')
-    .description('运行开发监听服务')
-    .option('-p, --port [port]', 'listening port')
-    .action(function(port){
-        run(watcher);
-    });
+	.command('run')
+	.description('运行开发监听服务')
+	.option('-p, --port [port]', 'listening port')
+	.action(function(port) {
+		run(watcher);
+	});
 
 program
-    .command('build')
-    .description('编译打包')
-    .action(function(port){
-        build();
-    });
+	.command('build')
+	.description('编译打包')
+	.action(function(port) {
+		build();
+	});
 
 program.parse(process.argv);
