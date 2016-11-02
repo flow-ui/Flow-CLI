@@ -2,4 +2,4 @@
 
 process.title = 'Front-flow-cli by tower1229';
 
-require('./bin/cli.js');
+module.exports = require('./bin/flow');

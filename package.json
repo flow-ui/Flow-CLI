@@ -1,13 +1,13 @@
 {
   "name": "front-flow-cli",
-  "version": "1.2.0",
+  "version": "1.2.1",
   "description": "为front-flow项目开发的命令行工具",
   "keywords": [
     "frontend",
     "front-flow"
   ],
   "author": "tower1229",
-  "license": "ISC",
+  "license": "MIT",
   "repository": {
     "type": "git",
     "url": "https://git.oschina.net/tower1229/front-flow-cli.git"
@@ -17,7 +17,7 @@
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "bin": {
-    "flow": "index.js"
+    "flow": "bin/flow.js"
   },
   "dependencies": {
     "browser-sync": "^2.14.0",
