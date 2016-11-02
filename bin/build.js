@@ -1,3 +1,4 @@
+const fs = require('fs');
 const path = require('path');
 const del = require('del');
 const gulp = require('gulp');
@@ -113,7 +114,7 @@ let html = function(pathObj, callback) {
 };
 
 let build = function(dir, callback) {
-	var got = 0,
+	let got = 0,
 		todoList = build.prototype.todoList,
 		resolve = function() {
 			got++;
@@ -129,8 +130,22 @@ let build = function(dir, callback) {
 				}
 			}
 		},
-		pathObj = getPaths(dir);
+		isExist = function() {
+			try {
+				return fs.statSync(path.join('./', pathObj.projectFolder)).isDirectory();
+			} catch (e) {
+				if (e.code != 'ENOENT')
+					throw e;
 
+				return false;
+			}
+		},
+		pathObj = getPaths(dir);
+	
+	if (!isExist()) {
+		console.log(pathObj.projectFolder + '不存在！');
+		return process.exit();
+	}
 	build.prototype.todoList.forEach(function(item, index) {
 		item(pathObj, resolve);
 	});

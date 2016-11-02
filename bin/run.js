@@ -10,7 +10,14 @@ let reload;
 let types;
 
 let watchHandle = function(type, file) {
-	let ext = file.match(/.*\.{1}([^.]*)$/)[1];
+	let ext = file.match(/.*\.{1}([^.]*)$/)[1],
+		delfile = function(){
+			del(file.replace(new RegExp(pathObj.projectFolder), pathObj.distFolder),{
+				dryRun:true
+			}).then(function(paths) {
+				console.log('已删除:\n', paths.join('\n'));
+			});
+		};
 	for (let key in types) {
 		if (types.hasOwnProperty(key)) {
 			if (types[key].indexOf(ext) > -1) {
@@ -25,12 +32,7 @@ let watchHandle = function(type, file) {
 				buildCore.scriptLib(pathObj, type === 'add' ? null : reload);
 			} else if (file.indexOf('\\js\\') > -1) {
 				if (type === 'unlink') {
-					let tmp = file.replace(new RegExp(pathObj.projectFolder), pathObj.distFolder);
-					del([tmp], {
-						force: true
-					}).then(function() {
-						console.log(tmp + '已删除');
-					});
+					delfile();
 				} else {
 					buildCore.scriptApp(pathObj, type === 'add' ? null : reload);
 				}
@@ -42,48 +44,24 @@ let watchHandle = function(type, file) {
 			break;
 		case 'img':
 			if (type === 'unlink') {
-				let tmp = file.replace(new RegExp(pathObj.projectFolder), pathObj.distFolder);
-				del([tmp], {
-					force: true
-				}).then(function() {
-					console.log(tmp + '已删除');
-				});
+				delfile();
 			} else {
 				buildCore.images(pathObj, type === 'add' ? null : reload);
 			}
 			break;
 		case 'css':
-			if (type === 'unlink') {
-				let tmp = file.replace(new RegExp(pathObj.projectFolder), pathObj.distFolder);
-				del([tmp], {
-					force: true
-				}).then(function() {
-					console.log(tmp + '已删除');
-				});
-			} else {
-				buildCore.css(pathObj, type === 'add' ? null : reload);
-			}
+			buildCore.css(pathObj, type === 'add' ? null : reload);
 			break;
 		case 'font':
 			if (type === 'unlink') {
-				let tmp = file.replace(new RegExp(pathObj.projectFolder), pathObj.distFolder);
-				del([tmp], {
-					force: true
-				}).then(function() {
-					console.log(tmp + '已删除');
-				});
+				delfile();
 			} else {
 				buildCore.font(pathObj, type === 'add' ? null : reload);
 			}
 			break;
 		case 'html':
 			if (type === 'unlink') {
-				let tmp = file.replace(new RegExp(pathObj.projectFolder), pathObj.distFolder);
-				del([tmp], {
-					force: true
-				}).then(function() {
-					console.log(tmp + '已删除');
-				});
+				delfile();
 			} else {
 				buildCore.html(pathObj, type === 'add' ? null : reload);
 			}
