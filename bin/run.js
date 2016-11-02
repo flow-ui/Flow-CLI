@@ -90,6 +90,9 @@ let run = function(dir) {
 			reload = browserSync.reload;
 			console.log('服务已启动...');
 			watcher.on('all', watchHandle);
+			watcher.on('error', function(error){
+				console.log(error);
+			});
 		});
 	});
 };
