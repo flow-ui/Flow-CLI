@@ -1,10 +1,13 @@
 #!/usr/bin/env node
+
 const init = require('./init');
 const run = require('./run');
 const build = require('./build').build;
 
 const program = require('commander');
 const pkg = require('../package.json');
+
+process.title = pkg.name + ' V' + pkg.version;
 
 program
 	.version(pkg.version)
