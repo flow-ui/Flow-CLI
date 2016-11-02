@@ -30,7 +30,7 @@ let dist;
 const getPaths = function(sourceDir){
 	if(sourceDir){
 		projectFolder = sourceDir;
-		distFolder = path.join('./dist_'+projectFolder);
+		distFolder = path.join('./dist'+projectFolder);
 	}else{
 		projectFolder = './_src';
 		distFolder = path.join('./dist');

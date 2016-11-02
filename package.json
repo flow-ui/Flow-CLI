@@ -1,6 +1,6 @@
 {
   "name": "front-flow-cli",
-  "version": "1.1.8",
+  "version": "1.1.9",
   "description": "为front-flow项目开发的命令行工具",
   "keywords": [
     "frontend",
@@ -10,7 +10,7 @@
   "license": "ISC",
   "repository": {
     "type": "git",
-    "url": "https://git.oschina.net/tower1229/front-flow.git"
+    "url": "https://git.oschina.net/tower1229/front-flow-cli.git"
   },
   "main": "index.js",
   "scripts": {
