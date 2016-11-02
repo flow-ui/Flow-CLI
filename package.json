@@ -1,6 +1,6 @@
 {
   "name": "front-flow-cli",
-  "version": "1.1.9",
+  "version": "1.2.0",
   "description": "为front-flow项目开发的命令行工具",
   "keywords": [
     "frontend",

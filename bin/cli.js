@@ -26,6 +26,8 @@ let projectFolder;
 let distFolder;
 let paths;
 let dist;
+let watch;
+let reload;
 
 const getPaths = function(sourceDir){
 	if(sourceDir){
@@ -55,9 +57,16 @@ const getPaths = function(sourceDir){
 		img: path.join(distFolder, './img'),
 		html: distFolder
 	};
-};
 
-let reload;
+	watch = chokidar.watch(['./_component', './modules', projectFolder], {
+		ignored: /[\/\\]\.|(\.[^\.]*TMP[^\.]*$)/,
+		awaitWriteFinish: {
+			stabilityThreshold: 300,
+			pollInterval: 300
+		}
+	});
+
+};
 
 const scriptLib = function(callback) {
 	gulp.src(paths.scriptLib)
@@ -245,16 +254,12 @@ let watchHandle = function(type, file) {
 	}
 };
 
-const watch = chokidar.watch(['./_component', './_src', './modules'], {
-	ignored: /[\/\\]\.|(\.[^\.]*TMP[^\.]*$)/,
-	awaitWriteFinish: {
-		stabilityThreshold: 300,
-		pollInterval: 300
-	}
-});
-
 const watcher = function() {
-	watch.on('all', watchHandle);
+	if(watch){
+		watch.on('all', watchHandle);
+	}else{
+		return console.log('watch未正确初始化');	
+	}
 };
 
 let serve = function(callback) {
