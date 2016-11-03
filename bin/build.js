@@ -89,6 +89,7 @@ let css = function(pathObj, callback) {
 			plugins: [autoprefix],
 			compress: true
 		}))
+		.pipe(replace('__folder', '/' + pathObj.distFolder))
 		.pipe(gulp.dest(pathObj.dist.css))
 		.on('end', function() {
 			if (typeof(callback) === 'function') {
