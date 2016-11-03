@@ -12,9 +12,7 @@ let types;
 let watchHandle = function(type, file) {
 	let ext = file.match(/.*\.{1}([^.]*)$/)[1],
 		delfile = function(){
-			del(file.replace(new RegExp(pathObj.projectFolder), pathObj.distFolder),{
-				dryRun:true
-			}).then(function(paths) {
+			del(file.replace(new RegExp(pathObj.projectFolder), pathObj.distFolder)).then(function(paths) {
 				console.log('已删除:\n', paths.join('\n'));
 			});
 		};
