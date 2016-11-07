@@ -10,7 +10,7 @@ let reload;
 let types;
 
 let watchHandle = function(type, file) {
-	let ext = file.match(/.*\.{1}([^.]*)$/)[1],
+	let ext = file.match(/.*\.{1}([^.]*)$/) ? file.match(/.*\.{1}([^.]*)$/)[1] : null,
 		delfile = function(){
 			del(file.replace(new RegExp(pathObj.projectFolder), pathObj.distFolder)).then(function(paths) {
 				console.log('已删除:\n', paths.join('\n'));
