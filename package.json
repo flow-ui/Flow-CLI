@@ -11,7 +11,7 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://git.oschina.net/tower1229/front-flow-cli.git"
+    "url": "https://github.com/tower1229/front-flow-cli"
   },
   "main": "index.js",
   "scripts": {
