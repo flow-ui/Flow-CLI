@@ -13,7 +13,7 @@ let reload;
 let watchHandle = function(type, file) {
 	let ext = file.match(/.*\.{1}([^.]*)$/) ? file.match(/.*\.{1}([^.]*)$/)[1] : null,
 		delfile = function() {
-			del(file.replace(new RegExp(globalConfig.projectDir), globalConfig.distFolder)).then(function(paths) {
+			del(file.replace(new RegExp(globalConfig.projectDir), globalConfig.distDir)).then(function(paths) {
 				console.log('已删除:\n', paths.join('\n'));
 			});
 		};
@@ -85,7 +85,7 @@ let run = function() {
 				baseDir: './',
 				directory: true
 			},
-			startPath: globalConfig.distFolder + "/" + globalConfig.homePage,
+			startPath: globalConfig.distDir + "/" + globalConfig.homePage,
 			reloadDelay: 0,
 			port: globalConfig.port,
 			logLevel: "silent"
@@ -96,7 +96,7 @@ let run = function() {
 			};
 			console.log(
 				clc.green("开发路径: /" + globalConfig.projectDir) +
-				clc.green("\n编译路径: /" + globalConfig.distFolder) +
+				clc.green("\n编译路径: /" + globalConfig.distDir) +
 				clc.green("\n发布地址: http://localhost:" + globalConfig.port)
 			);
 			spinner.succeed();

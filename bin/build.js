@@ -16,6 +16,7 @@ const ora = require('ora');
 let spinner = ora('正在构建...').start();
 
 const scriptLib = function(file, callback) {
+
 	gulp.src(globalConfig.paths.scriptLib)
 		.pipe(changed(globalConfig.dist.lib))
 		.pipe(gulp.dest(globalConfig.dist.lib));
@@ -23,7 +24,7 @@ const scriptLib = function(file, callback) {
 	gulp.src(globalConfig.paths.scriptConcat)
 		.pipe(cache('scriptConcat'))
 		.pipe(concat('sea.js'))
-		.pipe(replace('__folder', '/' + globalConfig.distFolder))
+		.pipe(replace('__folder', '/' + globalConfig.distDir))
 		.pipe(gulp.dest(globalConfig.dist.lib))
 		.on('end', function() {
 			if (typeof(callback) === 'function') {
@@ -63,9 +64,9 @@ script.prototype.todoList = [scriptLib, scriptApp];
 
 let image = function(file, callback) {
 	gulp.src(globalConfig.paths.imageALL)
-		.pipe(changed(globalConfig.distFolder))
+		.pipe(changed(globalConfig.distDir))
 		.pipe(imagemin())
-		.pipe(gulp.dest(globalConfig.distFolder));
+		.pipe(gulp.dest(globalConfig.distDir));
 
 	gulp.src(globalConfig.paths.image)
 		.pipe(changed(globalConfig.dist.img))
@@ -100,8 +101,8 @@ let css = function(file, callback) {
 			plugins: [autoprefix],
 			compress: true
 		}))
-		.pipe(replace('__folder', '/' + globalConfig.distFolder))
-		.pipe(gulp.dest(globalConfig.distFolder));
+		.pipe(replace('__folder', '/' + globalConfig.distDir))
+		.pipe(gulp.dest(globalConfig.distDir));
 
 	gulp.src(globalConfig.paths.css)
 		.pipe(sourcemaps.init())
@@ -115,7 +116,7 @@ let css = function(file, callback) {
 			plugins: [autoprefix],
 			compress: true
 		}))
-		.pipe(replace('__folder', '/' + globalConfig.distFolder))
+		.pipe(replace('__folder', '/' + globalConfig.distDir))
 		.pipe(sourcemaps.write('./maps'))
 		.pipe(gulp.dest(globalConfig.dist.css))
 		.on('end', function() {
@@ -134,7 +135,7 @@ let html = function(file, callback) {
 		.pipe(includer({
 			includePaths: [globalConfig.paths.include]
 		}))
-		.pipe(replace('__folder', '/' + globalConfig.distFolder))
+		.pipe(replace('__folder', '/' + globalConfig.distDir))
 		.pipe(gulp.dest(globalConfig.dist.html))
 		.on('end', function() {
 			if (typeof(callback) === 'function') {
