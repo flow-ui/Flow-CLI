@@ -2,7 +2,7 @@
 
 为front-flow项目开发的命令行工具
 
-[![DUB](https://img.shields.io/badge/npm-v2.0.2-blue.svg?maxAge=2592000)]() [![DUB](https://img.shields.io/badge/nodejs%20support-v6.5.0-green.svg?maxAge=2592000)]() [![Website](https://img.shields.io/website-up-down-green-red/http/shields.io.svg?maxAge=2592000)](http://zangtao.org/projects/front-flow-cli/) [![DUB](https://img.shields.io/dub/l/vibe-d.svg?maxAge=2592000)]()
+[![DUB](https://img.shields.io/badge/npm-v2.0.3-blue.svg?maxAge=2592000)]() [![DUB](https://img.shields.io/badge/nodejs%20support-v6.5.0-green.svg?maxAge=2592000)]() [![Website](https://img.shields.io/website-up-down-green-red/http/shields.io.svg?maxAge=2592000)](http://zangtao.org/projects/front-flow-cli/) [![DUB](https://img.shields.io/dub/l/vibe-d.svg?maxAge=2592000)]()
 
 
 ##功能

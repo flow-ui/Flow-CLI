@@ -7,7 +7,7 @@ const globalConfig = require('./paths')();
 const types = globalConfig.types;
 const clc = require('cli-color');
 const ora = require('ora');
-let spinner = ora('服务已启动...');
+let spinner = ora();
 let reload;
 
 let watchHandle = function(type, file) {
@@ -95,10 +95,11 @@ let run = function() {
 				browserSync.reload();
 			};
 			console.log(
-				clc.green("开发路径: /" + globalConfig.projectDir) +
-				clc.green("\n编译路径: /" + globalConfig.distDir) +
-				clc.green("\n发布地址: http://localhost:" + globalConfig.port)
+				clc.green("[开发路径] ") + "/" + globalConfig.projectDir +
+				clc.green("\n[编译路径] ") + "/" + globalConfig.distDir +
+				clc.green("\n[发布地址] ") + "http://localhost:" + globalConfig.port
 			);
+			spinner.text = '服务已启动...';
 			spinner.succeed();
 			watcher.on('all', watchHandle);
 			watcher.on('error', function(error) {

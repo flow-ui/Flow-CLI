@@ -156,12 +156,12 @@ let build = function(callback) {
 				got = null;
 				resolve = null;
 				todoList = null;
+				diff = process.hrtime(start);
+				spinner.text = '构建完成, 耗时:' + (diff[0] * 1e3 + diff[1] / 1e6).toFixed(2) + 'ms';
+				spinner.succeed();
 				if (typeof(callback) === 'function') {
 					callback();
 				} else {
-					diff = process.hrtime(start);
-					spinner.text = '构建完成, 耗时:' + (diff[0] * 1e3 + diff[1] / 1e6).toFixed(2) + 'ms\n';
-					spinner.succeed();
 					process.exit();
 				}
 			}
