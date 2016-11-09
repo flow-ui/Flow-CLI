@@ -15,7 +15,7 @@
   },
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "mocha"
   },
   "bin": {
     "flow": "bin/flow.js"
@@ -38,5 +38,8 @@
     "gulp-sourcemaps": "^2.2.0",
     "less-plugin-autoprefix": "^1.5.1",
     "ora": "^0.3.0"
+  },
+  "devDependencies": {
+    "mocha": "^3.1.2"
   }
 }
