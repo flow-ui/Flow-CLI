@@ -3,7 +3,7 @@ const gulp = require('gulp');
 const browserSync = require('browser-sync').create();
 const watch = require('./watch');
 const buildCore = require('./build');
-const globalConfig = require('./paths');
+const globalConfig = require('./paths')();
 const types = globalConfig.types;
 const clc = require('cli-color');
 const ora = require('ora');
@@ -13,7 +13,7 @@ let reload;
 let watchHandle = function(type, file) {
 	let ext = file.match(/.*\.{1}([^.]*)$/) ? file.match(/.*\.{1}([^.]*)$/)[1] : null,
 		delfile = function() {
-			del(file.replace(new RegExp(globalConfig.projectFolder), globalConfig.distFolder)).then(function(paths) {
+			del(file.replace(new RegExp(globalConfig.projectDir), globalConfig.distFolder)).then(function(paths) {
 				console.log('已删除:\n', paths.join('\n'));
 			});
 		};
@@ -77,7 +77,7 @@ let watchHandle = function(type, file) {
 };
 
 let run = function() {
-	let watcher = watch(globalConfig.projectFolder);
+	let watcher = watch(globalConfig.projectDir);
 
 	buildCore.build(function() {
 		browserSync.init({
@@ -95,7 +95,7 @@ let run = function() {
 				browserSync.reload();
 			};
 			console.log(
-				clc.green("开发路径: /" + globalConfig.projectFolder) +
+				clc.green("开发路径: /" + globalConfig.projectDir) +
 				clc.green("\n编译路径: /" + globalConfig.distFolder) +
 				clc.green("\n发布地址: http://localhost:" + globalConfig.port)
 			);

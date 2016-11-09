@@ -1,7 +1,4 @@
 #!/usr/bin/env node
-const init = require('./init');
-const run = require('./run');
-const build = require('./build').build;
 
 const program = require('commander');
 const pkg = require('../package.json');
@@ -14,23 +11,23 @@ program
 
 program
 	.command('init')
-	.description('初始化一个front-flow模板项目')
+	.description('初始化模板项目')
 	.action(function() {
-		init();
+		require('./init')();
 	});
 
 program
 	.command('run')
 	.description('运行开发服务')
 	.action(function() {
-		run();
+		require('./run')();
 	});
 
 program
 	.command('build')
 	.description('编译打包')
 	.action(function() {
-		build();
+		require('./build').build();
 	});
 
 program.parse(process.argv);

@@ -1,10 +1,11 @@
 {
   "name": "front-flow-cli",
-  "version": "2.0.0",
+  "version": "2.0.1",
   "description": "为front-flow项目开发的命令行工具",
   "keywords": [
     "frontend",
-    "front-flow"
+    "front-flow",
+    "front-flow-cli"
   ],
   "author": "tower1229",
   "license": "MIT",

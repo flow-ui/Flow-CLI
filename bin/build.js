@@ -1,6 +1,5 @@
 const fs = require('fs');
 const path = require('path');
-const del = require('del');
 const gulp = require('gulp');
 const replace = require('gulp-replace');
 const includer = require('gulp-include');
@@ -12,20 +11,20 @@ const sourcemaps = require('gulp-sourcemaps');
 const concat = require('gulp-concat');
 const changed = require('gulp-changed');
 const cache = require('gulp-cached');
-const pathObj = require('./paths');
+const globalConfig = require('./paths')();
 const ora = require('ora');
-
-let spinner = ora('项目构建完成！');
+let spinner = ora('正在构建...').start();
 
 const scriptLib = function(file, callback) {
-	gulp.src(pathObj.paths.scriptLib)
-		.pipe(changed(pathObj.dist.lib))
-		.pipe(gulp.dest(pathObj.dist.lib));
-	gulp.src(pathObj.paths.scriptConcat)
+	gulp.src(globalConfig.paths.scriptLib)
+		.pipe(changed(globalConfig.dist.lib))
+		.pipe(gulp.dest(globalConfig.dist.lib));
+
+	gulp.src(globalConfig.paths.scriptConcat)
 		.pipe(cache('scriptConcat'))
 		.pipe(concat('sea.js'))
-		.pipe(replace('__folder', '/' + pathObj.distFolder))
-		.pipe(gulp.dest(pathObj.dist.lib))
+		.pipe(replace('__folder', '/' + globalConfig.distFolder))
+		.pipe(gulp.dest(globalConfig.dist.lib))
 		.on('end', function() {
 			if (typeof(callback) === 'function') {
 				callback();
@@ -34,9 +33,9 @@ const scriptLib = function(file, callback) {
 };
 
 const scriptApp = function(file, callback) {
-	gulp.src(pathObj.paths.scriptApp)
-		.pipe(changed(pathObj.dist.js))
-		.pipe(gulp.dest(pathObj.dist.js))
+	gulp.src(globalConfig.paths.scriptApp)
+		.pipe(changed(globalConfig.dist.js))
+		.pipe(gulp.dest(globalConfig.dist.js))
 		.on('end', function() {
 			if (typeof(callback) === 'function') {
 				callback();
@@ -45,7 +44,7 @@ const scriptApp = function(file, callback) {
 };
 
 let script = function(file, callback) {
-	var got = 0,
+	let got = 0,
 		todoList = script.prototype.todoList,
 		resolve = function() {
 			got++;
@@ -63,15 +62,15 @@ let script = function(file, callback) {
 script.prototype.todoList = [scriptLib, scriptApp];
 
 let image = function(file, callback) {
-	gulp.src(pathObj.paths.imageALL)
-		.pipe(changed(pathObj.distFolder))
+	gulp.src(globalConfig.paths.imageALL)
+		.pipe(changed(globalConfig.distFolder))
 		.pipe(imagemin())
-		.pipe(gulp.dest(pathObj.distFolder));
+		.pipe(gulp.dest(globalConfig.distFolder));
 
-	gulp.src(pathObj.paths.image)
-		.pipe(changed(pathObj.dist.img))
+	gulp.src(globalConfig.paths.image)
+		.pipe(changed(globalConfig.dist.img))
 		.pipe(imagemin())
-		.pipe(gulp.dest(pathObj.dist.img))
+		.pipe(gulp.dest(globalConfig.dist.img))
 		.on('end', function() {
 			if (typeof(callback) === 'function') {
 				callback();
@@ -80,44 +79,45 @@ let image = function(file, callback) {
 };
 
 let font = function(file, callback) {
-	del(pathObj.dist.font, {
-		force: true
-	}).then(function() {
-		return gulp.src(pathObj.paths.font)
-			.pipe(gulp.dest(pathObj.dist.font))
-			.on('end', function() {
-				if (typeof(callback) === 'function') {
-					callback();
-				}
-			});
-	});
+	gulp.src(globalConfig.paths.font)
+		.pipe(gulp.dest(globalConfig.dist.font))
+		.on('end', function() {
+			if (typeof(callback) === 'function') {
+				callback();
+			}
+		});
 };
 
 let css = function(file, callback) {
-	gulp.src(pathObj.paths.cssAll)
+	gulp.src(globalConfig.paths.cssAll)
+		.pipe(includer({
+			extensions: ['css', 'less'],
+			hardFail: true,
+			includePaths: [path.join(globalConfig.projectDir, './css')]
+		}))
 		.pipe(cache('cssAll'))
 		.pipe(less({
 			plugins: [autoprefix],
 			compress: true
 		}))
-		.pipe(replace('__folder', '/' + pathObj.distFolder))
-		.pipe(gulp.dest(pathObj.distFolder));
+		.pipe(replace('__folder', '/' + globalConfig.distFolder))
+		.pipe(gulp.dest(globalConfig.distFolder));
 
-	gulp.src(pathObj.paths.css)
+	gulp.src(globalConfig.paths.css)
 		.pipe(sourcemaps.init())
 		.pipe(includer({
 			extensions: ['css', 'less'],
 			hardFail: true,
-			includePaths: [path.join('./_component'), path.join(pathObj.projectFolder, './css'), pathObj.paths.include]
+			includePaths: [path.join('./_component'), path.join(globalConfig.projectDir, './css'), globalConfig.paths.include]
 		}))
 		.pipe(cache('css'))
 		.pipe(less({
 			plugins: [autoprefix],
 			compress: true
 		}))
-		.pipe(replace('__folder', '/' + pathObj.distFolder))
+		.pipe(replace('__folder', '/' + globalConfig.distFolder))
 		.pipe(sourcemaps.write('./maps'))
-		.pipe(gulp.dest(pathObj.dist.css))
+		.pipe(gulp.dest(globalConfig.dist.css))
 		.on('end', function() {
 			if (typeof(callback) === 'function') {
 				callback();
@@ -126,25 +126,29 @@ let css = function(file, callback) {
 };
 
 let html = function(file, callback) {
-	gulp.src(pathObj.paths.html)
-		.pipe(changed(pathObj.dist.html))
+	gulp.src(path.join(globalConfig.projectDir, './*.ico'))
+		.pipe(gulp.dest(globalConfig.dist.html));
+
+	gulp.src(globalConfig.paths.html)
+		.pipe(changed(globalConfig.dist.html))
 		.pipe(includer({
-			includePaths: [pathObj.paths.include]
+			includePaths: [globalConfig.paths.include]
 		}))
-		.pipe(replace('__folder', '/' + pathObj.distFolder))
-		.pipe(gulp.dest(pathObj.dist.html))
+		.pipe(replace('__folder', '/' + globalConfig.distFolder))
+		.pipe(gulp.dest(globalConfig.dist.html))
 		.on('end', function() {
 			if (typeof(callback) === 'function') {
 				callback();
 			}
 		});
-	gulp.src(path.join(pathObj.projectFolder, './*.ico'))
-		.pipe(gulp.dest(pathObj.dist.html));
+	
 };
 
 let build = function(callback) {
 	let got = 0,
 		todoList = build.prototype.todoList,
+		start = process.hrtime(),
+		diff,
 		resolve = function() {
 			got++;
 			if (got >= todoList.length) {
@@ -154,28 +158,29 @@ let build = function(callback) {
 				if (typeof(callback) === 'function') {
 					callback();
 				} else {
+					diff = process.hrtime(start);
+					spinner.text = '构建完成, 耗时:' + (diff[0] * 1e3 + diff[1] / 1e6).toFixed(2) + 'ms\n';
 					spinner.succeed();
 					process.exit();
 				}
 			}
 		},
-		isExist = function() {
+		isExist = function(dir) {
 			try {
-				return fs.statSync(path.join('./', pathObj.projectFolder)).isDirectory();
+				return fs.statSync(dir).isDirectory();
 			} catch (e) {
 				if (e.code != 'ENOENT')
 					throw e;
-
 				return false;
 			}
 		};
-	
-	if (!isExist()) {
-		console.log(pathObj.projectFolder + '不存在！');
+	if (!isExist(path.join('./', globalConfig.projectDir))) {
+		console.log(globalConfig.projectDir + '不存在！');
 		return process.exit();
 	}
+
 	build.prototype.todoList.forEach(function(item, index) {
-		item(pathObj, resolve);
+		item(globalConfig, resolve);
 	});
 };
 build.prototype.todoList = [script, image, font, css, html];
