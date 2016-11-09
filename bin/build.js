@@ -22,7 +22,6 @@ const scriptLib = function(file, callback) {
 		.pipe(gulp.dest(globalConfig.dist.lib));
 
 	gulp.src(globalConfig.paths.scriptConcat)
-		.pipe(cache('scriptConcat'))
 		.pipe(concat('sea.js'))
 		.pipe(replace('__folder', '/' + globalConfig.distDir))
 		.pipe(gulp.dest(globalConfig.dist.lib))
