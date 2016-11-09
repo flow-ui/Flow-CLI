@@ -8,13 +8,21 @@ const imagemin = require('gulp-imagemin');
 const less = require('gulp-less');
 const LessAutoprefix = require('less-plugin-autoprefix');
 const autoprefix = new LessAutoprefix();
+const sourcemaps = require('gulp-sourcemaps');
 const concat = require('gulp-concat');
-const getPaths = require('./paths');
+const changed = require('gulp-changed');
+const cache = require('gulp-cached');
+const pathObj = require('./paths');
+const ora = require('ora');
 
-const scriptLib = function(pathObj, callback) {
+let spinner = ora('项目构建完成！');
+
+const scriptLib = function(file, callback) {
 	gulp.src(pathObj.paths.scriptLib)
+		.pipe(changed(pathObj.dist.lib))
 		.pipe(gulp.dest(pathObj.dist.lib));
 	gulp.src(pathObj.paths.scriptConcat)
+		.pipe(cache('scriptConcat'))
 		.pipe(concat('sea.js'))
 		.pipe(replace('__folder', '/' + pathObj.distFolder))
 		.pipe(gulp.dest(pathObj.dist.lib))
@@ -25,8 +33,9 @@ const scriptLib = function(pathObj, callback) {
 		});
 };
 
-const scriptApp = function(pathObj, callback) {
+const scriptApp = function(file, callback) {
 	gulp.src(pathObj.paths.scriptApp)
+		.pipe(changed(pathObj.dist.js))
 		.pipe(gulp.dest(pathObj.dist.js))
 		.on('end', function() {
 			if (typeof(callback) === 'function') {
@@ -35,7 +44,7 @@ const scriptApp = function(pathObj, callback) {
 		});
 };
 
-let script = function(pathObj, callback) {
+let script = function(file, callback) {
 	var got = 0,
 		todoList = script.prototype.todoList,
 		resolve = function() {
@@ -48,13 +57,19 @@ let script = function(pathObj, callback) {
 			}
 		};
 	script.prototype.todoList.forEach(function(item, index) {
-		item(pathObj, resolve);
+		item(file, resolve);
 	});
 };
 script.prototype.todoList = [scriptLib, scriptApp];
 
-let images = function(pathObj, callback) {
-	gulp.src(pathObj.paths.images)
+let image = function(file, callback) {
+	gulp.src(pathObj.paths.imageALL)
+		.pipe(changed(pathObj.distFolder))
+		.pipe(imagemin())
+		.pipe(gulp.dest(pathObj.distFolder));
+
+	gulp.src(pathObj.paths.image)
+		.pipe(changed(pathObj.dist.img))
 		.pipe(imagemin())
 		.pipe(gulp.dest(pathObj.dist.img))
 		.on('end', function() {
@@ -64,7 +79,7 @@ let images = function(pathObj, callback) {
 		});
 };
 
-let font = function(pathObj, callback) {
+let font = function(file, callback) {
 	del(pathObj.dist.font, {
 		force: true
 	}).then(function() {
@@ -78,18 +93,30 @@ let font = function(pathObj, callback) {
 	});
 };
 
-let css = function(pathObj, callback) {
-	gulp.src(pathObj.paths.css)
-		.pipe(includer({
-			extensions: ['css', 'less'],
-			hardFail: true,
-			includePaths: [path.join('./_component'), path.join(pathObj.projectFolder, './css'), path.join(pathObj.projectFolder, './include')]
-		}))
+let css = function(file, callback) {
+	gulp.src(pathObj.paths.cssAll)
+		.pipe(cache('cssAll'))
 		.pipe(less({
 			plugins: [autoprefix],
 			compress: true
 		}))
 		.pipe(replace('__folder', '/' + pathObj.distFolder))
+		.pipe(gulp.dest(pathObj.distFolder));
+
+	gulp.src(pathObj.paths.css)
+		.pipe(sourcemaps.init())
+		.pipe(includer({
+			extensions: ['css', 'less'],
+			hardFail: true,
+			includePaths: [path.join('./_component'), path.join(pathObj.projectFolder, './css'), pathObj.paths.include]
+		}))
+		.pipe(cache('css'))
+		.pipe(less({
+			plugins: [autoprefix],
+			compress: true
+		}))
+		.pipe(replace('__folder', '/' + pathObj.distFolder))
+		.pipe(sourcemaps.write('./maps'))
 		.pipe(gulp.dest(pathObj.dist.css))
 		.on('end', function() {
 			if (typeof(callback) === 'function') {
@@ -98,10 +125,11 @@ let css = function(pathObj, callback) {
 		});
 };
 
-let html = function(pathObj, callback) {
+let html = function(file, callback) {
 	gulp.src(pathObj.paths.html)
+		.pipe(changed(pathObj.dist.html))
 		.pipe(includer({
-			includePaths: [path.join(pathObj.projectFolder, './include')]
+			includePaths: [pathObj.paths.include]
 		}))
 		.pipe(replace('__folder', '/' + pathObj.distFolder))
 		.pipe(gulp.dest(pathObj.dist.html))
@@ -114,7 +142,7 @@ let html = function(pathObj, callback) {
 		.pipe(gulp.dest(pathObj.dist.html));
 };
 
-let build = function(dir, callback) {
+let build = function(callback) {
 	let got = 0,
 		todoList = build.prototype.todoList,
 		resolve = function() {
@@ -126,7 +154,7 @@ let build = function(dir, callback) {
 				if (typeof(callback) === 'function') {
 					callback();
 				} else {
-					console.log('项目构建完成！');
+					spinner.succeed();
 					process.exit();
 				}
 			}
@@ -140,8 +168,7 @@ let build = function(dir, callback) {
 
 				return false;
 			}
-		},
-		pathObj = getPaths(dir);
+		};
 	
 	if (!isExist()) {
 		console.log(pathObj.projectFolder + '不存在！');
@@ -151,14 +178,14 @@ let build = function(dir, callback) {
 		item(pathObj, resolve);
 	});
 };
-build.prototype.todoList = [script, images, font, css, html];
+build.prototype.todoList = [script, image, font, css, html];
 
 module.exports = {
 	build: build,
 	script: script,
 	scriptLib: scriptLib,
 	scriptApp: scriptApp,
-	images: images,
+	image: image,
 	font: font,
 	css: css,
 	html: html

@@ -3,16 +3,17 @@ const gulp = require('gulp');
 const browserSync = require('browser-sync').create();
 const watch = require('./watch');
 const buildCore = require('./build');
-const getPaths = require('./paths');
-
-let pathObj;
+const globalConfig = require('./paths');
+const types = globalConfig.types;
+const clc = require('cli-color');
+const ora = require('ora');
+let spinner = ora('服务已启动...');
 let reload;
-let types;
 
 let watchHandle = function(type, file) {
 	let ext = file.match(/.*\.{1}([^.]*)$/) ? file.match(/.*\.{1}([^.]*)$/)[1] : null,
-		delfile = function(){
-			del(file.replace(new RegExp(pathObj.projectFolder), pathObj.distFolder)).then(function(paths) {
+		delfile = function() {
+			del(file.replace(new RegExp(globalConfig.projectFolder), globalConfig.distFolder)).then(function(paths) {
 				console.log('已删除:\n', paths.join('\n'));
 			});
 		};
@@ -27,12 +28,12 @@ let watchHandle = function(type, file) {
 	switch (ext) {
 		case 'script':
 			if (file.indexOf('\\lib\\') > -1 || file.indexOf('seajs.config') > -1) {
-				buildCore.scriptLib(pathObj, type === 'add' ? null : reload);
+				buildCore.scriptLib(file, type === 'add' ? null : reload);
 			} else if (file.indexOf('\\js\\') > -1) {
 				if (type === 'unlink') {
 					delfile();
 				} else {
-					buildCore.scriptApp(pathObj, type === 'add' ? null : reload);
+					buildCore.scriptApp(file, type === 'add' ? null : reload);
 				}
 			} else if (type === 'change' && typeof reload === 'function') {
 				reload();
@@ -44,51 +45,63 @@ let watchHandle = function(type, file) {
 			if (type === 'unlink') {
 				delfile();
 			} else {
-				buildCore.images(pathObj, type === 'add' ? null : reload);
+				buildCore.image(file, type === 'add' ? null : reload);
 			}
 			break;
 		case 'css':
-			buildCore.css(pathObj, type === 'add' ? null : reload);
+			if (type === 'unlink') {
+				delfile();
+			} else {
+				buildCore.css(file, type === 'add' ? null : reload);
+			}
 			break;
 		case 'font':
 			if (type === 'unlink') {
 				delfile();
 			} else {
-				buildCore.font(pathObj, type === 'add' ? null : reload);
+				buildCore.font(file, type === 'add' ? null : reload);
 			}
 			break;
 		case 'html':
 			if (type === 'unlink') {
 				delfile();
 			} else {
-				buildCore.html(pathObj, type === 'add' ? null : reload);
+				buildCore.html(file, type === 'add' ? null : reload);
 			}
 			break;
 		default:
-			console.log(file + '不在监听范围');
+			if (type === 'unlink' || type === 'unlinkDir') {
+				delfile();
+			}
 	}
 };
 
-let run = function(dir) {
-	let watcher;
-	pathObj = getPaths(dir);
-	types = pathObj.types;
-	watcher = watch(pathObj.projectFolder);
+let run = function() {
+	let watcher = watch(globalConfig.projectFolder);
 
-	buildCore.build(pathObj.projectFolder, function() {
+	buildCore.build(function() {
 		browserSync.init({
 			server: {
 				baseDir: './',
 				directory: true
 			},
-			startPath: pathObj.distFolder + "/index.html",
+			startPath: globalConfig.distFolder + "/" + globalConfig.homePage,
 			reloadDelay: 0,
-			port: 3000
+			port: globalConfig.port,
+			logLevel: "silent"
 		}, function() {
-			reload = browserSync.reload;
-			console.log('服务已启动...');
+			reload = function() {
+				console.warn(clc.white('浏览器刷新...'));
+				browserSync.reload();
+			};
+			console.log(
+				clc.green("开发路径: /" + globalConfig.projectFolder) +
+				clc.green("\n编译路径: /" + globalConfig.distFolder) +
+				clc.green("\n发布地址: http://localhost:" + globalConfig.port)
+			);
+			spinner.succeed();
 			watcher.on('all', watchHandle);
-			watcher.on('error', function(error){
+			watcher.on('error', function(error) {
 				console.log(error);
 			});
 		});

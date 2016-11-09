@@ -10,7 +10,7 @@ process.title = pkg.name + ' V' + pkg.version;
 
 program
 	.version(pkg.version)
-	.usage('[command] <option>');
+	.usage('[command]');
 
 program
 	.command('init')
@@ -20,17 +20,17 @@ program
 	});
 
 program
-	.command('run [dir]')
+	.command('run')
 	.description('运行开发服务')
-	.action(function(dir) {
-		run(dir);
+	.action(function() {
+		run();
 	});
 
 program
-	.command('build [dir]')
+	.command('build')
 	.description('编译打包')
-	.action(function(dir) {
-		build(dir);
+	.action(function() {
+		build();
 	});
 
 program.parse(process.argv);

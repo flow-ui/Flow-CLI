@@ -1,9 +1,15 @@
+const fs = require('fs');
 const path = require('path');
+const isExist = function() {
+	try {
+		return fs.statSync(path.join(process.cwd(), './config.json')).isFile();
+	} catch (e) {
+		if (e.code != 'ENOENT')
+			throw e;
+		return false;
+	}
+};
 
-let projectFolder;
-let distFolder;
-let paths;
-let dist;
 const types = {
 	script: 'js',
 	css: 'css,less',
@@ -12,40 +18,38 @@ const types = {
 	font: 'eot,svg,ttf,woff'
 };
 
-const getPaths = function(sourceDir) {
-	if (sourceDir) {
-		projectFolder = sourceDir;
-	} else {
-		projectFolder = '_src';
+let userConfig = {};
+if (isExist()) {
+	userConfig = require(path.join(process.cwd(), './config.json'));
+}
+
+let globalConfig = {
+	projectFolder: userConfig.projectDir,
+	distFolder: userConfig.distDir,
+	port: userConfig.port,
+	homePage: userConfig.homePage,
+	types: types,
+	paths: {
+		scriptConcat: [path.join(userConfig.projectDir, './lib/seajs/sea.js'), path.join(userConfig.projectDir, './seajs.config.js'), path.join(userConfig.projectDir, './lib/seajs/manifest.js'), path.join(userConfig.projectDir, './lib/seajs/seajs-localcache.js')],
+		scriptApp: [path.join(userConfig.projectDir, './js/*')],
+		scriptLib: [path.join(userConfig.projectDir, './lib/*'), '!**/seajs'],
+		image: [path.join(userConfig.projectDir, './img/**/*.{' + types.img + '}')],
+		imageALL: [path.join(userConfig.projectDir, './**/*.{' + types.img + '}'), '!' + path.join(userConfig.projectDir, './img/**/*.{' + types.img + '}')],
+		css: [path.join(userConfig.projectDir, './css/style.less')],
+		cssAll: [path.join(userConfig.projectDir, './**/*.{' + types.css + '}'), '!' + path.join(userConfig.projectDir, './include/*'), '!' + path.join(userConfig.projectDir, './css/*')],
+		font: [path.join(userConfig.projectDir, './font/*.{' + types.font + '}')],
+		html: path.join(userConfig.projectDir, './*.html'),
+		htmlAll: path.join(userConfig.projectDir, '**/*.html'),
+		include: path.join(userConfig.projectDir, './include')
+	},
+	dist: {
+		lib: path.join(userConfig.distDir, './lib'),
+		js: path.join(userConfig.distDir, './js'),
+		css: path.join(userConfig.distDir, './css'),
+		font: path.join(userConfig.distDir, './font'),
+		img: path.join(userConfig.distDir, './img'),
+		html: path.join(userConfig.distDir)
 	}
-	distFolder = 'dist' + projectFolder;
-	paths = {
-		scriptConcat: [path.join(projectFolder, './lib/seajs/sea.js'), path.join(projectFolder, './seajs.config.js'), path.join(projectFolder, './lib/seajs/manifest.js'), path.join(projectFolder, './lib/seajs/seajs-localcache.js')],
-		scriptApp: [path.join(projectFolder, './js/*')],
-		scriptLib: [path.join(projectFolder, './lib/*')],
-		images: [path.join(projectFolder, './img/**/*.{' + types.img + '}')],
-		css: [path.join(projectFolder, './css/style.less')],
-		cssAll: [path.join(projectFolder, './css/**/*.less'), path.join('./_component/**/*.less'), path.join(projectFolder, './include/**/*.less')],
-		font: [path.join(projectFolder, './font/*')],
-		html: path.join(projectFolder, './*.html'),
-		htmlAll: path.join(projectFolder, '**/*.html'),
-		include: path.join(projectFolder, './include')
-	};
-	dist = {
-		lib: path.join(distFolder, './lib'),
-		js: path.join(distFolder, './js'),
-		css: path.join(distFolder, './css'),
-		font: path.join(distFolder, './font'),
-		img: path.join(distFolder, './img'),
-		html: path.join(distFolder)
-	};
-	return {
-		projectFolder: projectFolder,
-		distFolder: distFolder,
-		paths: paths,
-		dist: dist,
-		types: types
-	};
 };
 
-module.exports = getPaths;
+module.exports = globalConfig;
