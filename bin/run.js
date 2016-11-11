@@ -1,11 +1,11 @@
 const del = require('del');
 const gulp = require('gulp');
+const gutil = require('gulp-util');
 const browserSync = require('browser-sync').create();
 const watch = require('./watch');
 const buildCore = require('./build');
 const globalConfig = require('./paths')();
 const types = globalConfig.types;
-const clc = require('cli-color');
 const ora = require('ora');
 let spinner = ora();
 let reload;
@@ -35,8 +35,8 @@ let watchHandle = function(type, file) {
 				} else {
 					buildCore.scriptApp(file, type === 'add' ? null : reload);
 				}
-			} else if (type === 'change' && typeof reload === 'function') {
-				reload();
+			} else if (type === 'change') {
+				buildCore.script(file, reload);
 			} else {
 				console.log('script 未命中:' + file);
 			}
@@ -91,13 +91,13 @@ let run = function() {
 			logLevel: "silent"
 		}, function() {
 			reload = function() {
-				console.warn(clc.white('浏览器刷新...'));
+				console.log('浏览器刷新...');
 				browserSync.reload();
 			};
 			console.log(
-				clc.green("[开发路径] ") + "/" + globalConfig.projectDir +
-				clc.green("\n[编译路径] ") + "/" + globalConfig.distDir +
-				clc.green("\n[发布地址] ") + "http://localhost:" + globalConfig.port
+				gutil.colors.green("[开发路径] ") + "/" + globalConfig.projectDir +
+				gutil.colors.green("\n[编译路径] ") + "/" + globalConfig.distDir +
+				gutil.colors.green("\n[发布地址] ") + "http://localhost:" + globalConfig.port
 			);
 			spinner.text = '服务已启动...';
 			spinner.succeed();
