@@ -3,7 +3,6 @@ const path = require('path');
 const gulp = require('gulp');
 const gutil = require('gulp-util');
 const replace = require('gulp-replace');
-const includer = require('gulp-include');
 const imagemin = require('gulp-imagemin');
 const less = require('gulp-less');
 const LessAutoprefix = require('less-plugin-autoprefix');
