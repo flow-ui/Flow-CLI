@@ -22,7 +22,7 @@ const isExist = function(dir) {
 		return false;
 	}
 };
-const contains = function(arr, str) {
+const isContain = function(arr, str) {
 	let i = arr.length;
 	while (i--) {
 		if (arr[i] === str) {
@@ -31,7 +31,19 @@ const contains = function(arr, str) {
 	}
 	return false;
 };
+const insertBeforeStr = function(fileContents, search, str){
+    let index, start, end;
+    index = fileContents.indexOf(search);
+    if(index > -1){
+        start = fileContents.substr(0, index);
+        end = fileContents.substr(index);
+        return start + str + end;
+    } else {
+        return fileContents;
+    }
+}
 let spinner = ora('正在构建...').start();
+//全局组件缓存
 let widgets = {};
 let getWidget = function(widgetName, type, page) {
 	let includePath = path.join(globalConfig.paths.include, widgetName);
@@ -65,15 +77,15 @@ let getWidget = function(widgetName, type, page) {
 		if (widgets[widgetName]) {
 			if (page.split && widgets[widgetName][type]) {
 				result = widgets[widgetName][type];
-				if (!contains(widgets[widgetName].alise, page)) {
+				if (!isContain(widgets[widgetName].alise, page)) {
 					widgets[widgetName].alise.push(page);
 				}
 			} else {
-				result = fs.readFileSync(sourcePath).toString();
+				result = fs.readFileSync(sourcePath).toString().trim();
 				widgets[widgetName][type] = result;
 			}
 		} else {
-			result = fs.readFileSync(sourcePath).toString();
+			result = fs.readFileSync(sourcePath).toString().trim();
 			widgets[widgetName] = {
 				alise: [page]
 			};
@@ -213,7 +225,9 @@ let css = function(filePath, callback) {
 		let destTarget = globalConfig.distDir;
 		if(otherTarget.split){
 			let destmatch = otherTarget.match(/_src\\([^\\]+)\\style.less/);
-			destTarget = path.join(destTarget,'/'+destmatch[1]);
+			if(destmatch){
+				destTarget = path.join(destTarget,'/'+destmatch[1]);
+			}
 		}
 		gulp.src(otherTarget)
 			.pipe(less({
@@ -291,6 +305,7 @@ let html = function(filePath, callback) {
 		.pipe(tap(function(file) {
 			let content = file.contents.toString();
 			let matches = content.match(/^(\s+)?(\/\/|\/\*|\#|\<\!\-\-)(\s+)?=(\s+)?(include|require)(.+$)/mg);
+			//页面级组件缓存
 			let pageWidget = {};
 			let getPageWidget = function(name, type, refresh) {
 				let result;
@@ -330,7 +345,7 @@ let html = function(filePath, callback) {
 			//清理 widgets
 			for (let x in widgets) {
 				if (widgets.hasOwnProperty(x)) {
-					if (contains(widgets[x].alise, file.path) && !pageWidget[x]) {
+					if (isContain(widgets[x].alise, file.path) && !pageWidget[x]) {
 						let _ = widgets[x].alise;
 						widgets[x].alise.forEach(function(page, i) {
 							if (page === file.path) {
@@ -342,9 +357,8 @@ let html = function(filePath, callback) {
 					}
 				}
 			}
-
-			//插入script
-			var scriptWrap = '<script>';
+			//内联script
+			let scriptWrap = '<script>';
 			for (let x in pageWidget) {
 				if (pageWidget.hasOwnProperty(x)) {
 					if (pageWidget[x].script) {
@@ -353,12 +367,14 @@ define("${x}-script-inline",function(require) {
 	${pageWidget[x].script}
 });
 seajs.use("${x}-script-inline");
-`
+`;
 					}
 				}
 			}
-			scriptWrap += '</script>';
-			content += scriptWrap;
+			if(scriptWrap!=='<script>'){
+				scriptWrap += '</script>';
+				content += scriptWrap;
+			}
 			file.contents = Buffer.from(content);
 			return file;
 		}))
