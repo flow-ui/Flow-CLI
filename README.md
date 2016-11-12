@@ -1,7 +1,7 @@
 # front-flow-cli
 为front-flow项目开发的命令行工具
 
-[![DUB](https://travis-ci.org/tower1229/front-flow-cli.svg)]() [![DUB](https://img.shields.io/badge/nodejs%20support-v6.5.0-green.svg?maxAge=2592000)]() [![Website](https://img.shields.io/website-up-down-green-red/http/shields.io.svg?maxAge=2592000)](http://zangtao.org/projects/front-flow-cli/) [![DUB](https://img.shields.io/dub/l/vibe-d.svg?maxAge=2592000)]()
+[![npm](https://img.shields.io/npm/v/front-flow-cli.svg)](https://www.npmjs.com/package/front-flow-cli)[![DUB](https://travis-ci.org/tower1229/front-flow-cli.svg)]() [![DUB](https://img.shields.io/badge/nodejs%20support-v6.5.0-green.svg?maxAge=2592000)]() [![Website](https://img.shields.io/website-up-down-green-red/http/shields.io.svg?maxAge=2592000)](http://zangtao.org/projects/front-flow-cli/) [![DUB](https://img.shields.io/dub/l/vibe-d.svg?maxAge=2592000)]()
 
 
 ##功能
