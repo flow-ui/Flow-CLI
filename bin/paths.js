@@ -11,10 +11,10 @@ const isExist = function(file) {
 };
 const configFile = path.join(process.cwd(), './config.json');
 const types = {
-	script: 'js',
+	script: 'js,coffee',
 	css: 'css,less',
 	img: 'JPG,jpg,png,gif',
-	html: 'html',
+	html: 'htm,html',
 	font: 'eot,svg,ttf,woff'
 };
 const getPath = function() {
@@ -23,17 +23,17 @@ const getPath = function() {
 		let globalConfig = {
 			types: types,
 			paths: {
-				scriptConcat: [path.join(userConfig.projectDir, './lib/seajs/sea.js'), path.join(userConfig.projectDir, './seajs.config.js'), path.join(userConfig.projectDir, './lib/seajs/manifest.js'), path.join(userConfig.projectDir, './lib/seajs/seajs-localcache.js')],
-				scriptApp: [path.join(userConfig.projectDir, './js/*')],
-				scriptLib: [path.join(userConfig.projectDir, './lib/*'), '!**/seajs'],
-				image: [path.join(userConfig.projectDir, './img/**/*.{' + types.img + '}')],
-				imageALL: [path.join(userConfig.projectDir, './**/*.{' + types.img + '}'), '!' + path.join(userConfig.projectDir, './img/**/*.{' + types.img + '}')],
-				css: [path.join(userConfig.projectDir, './css/style.less')],
-				cssAll: [path.join(userConfig.projectDir, './**/*.{' + types.css + '}'), '!' + path.join(userConfig.projectDir, './include/*'), '!' + path.join(userConfig.projectDir, './css/*')],
-				font: [path.join(userConfig.projectDir, './font/*.{' + types.font + '}')],
-				html: path.join(userConfig.projectDir, './*.html'),
-				htmlAll: path.join(userConfig.projectDir, '**/*.html'),
-				include: path.join(userConfig.projectDir, './include')
+				scriptConcat: [path.join(userConfig.projectDir, '/lib/seajs/sea.js'), path.join(userConfig.projectDir, '/seajs.config.js'), path.join(userConfig.projectDir, '/lib/seajs/manifest.js'), path.join(userConfig.projectDir, '/lib/seajs/seajs-localcache.js')],
+				scriptApp: [path.join(userConfig.projectDir, '/js/*.{' + types.script + '}')],
+				scriptLib: [path.join(userConfig.projectDir, '/lib/*.{' + types.script + '}'), '!**/seajs'],
+				image: [path.join(userConfig.projectDir, '/img/**/*.{' + types.img + '}')],
+				imageALL: [path.join(userConfig.projectDir, '/**/*.{' + types.img + '}'), '!' + path.join(userConfig.projectDir, '/img/**/*.{' + types.img + '}')],
+				cssMain: [path.join(userConfig.projectDir, '/css/style.less')],
+				cssOther: [path.join(userConfig.projectDir, '/**/*.{' + types.css + '}'), '!' + path.join(userConfig.projectDir, '/include/**'), '!' + path.join(userConfig.projectDir, '/css/**')],
+				font: [path.join(userConfig.projectDir, '/font/*.{' + types.font + '}')],
+				html: path.join(userConfig.projectDir, '/*.{' + types.html + '}'),
+				htmlAll: path.join(userConfig.projectDir, '**/*.{' + types.html + '}'),
+				include: path.join(userConfig.projectDir, '/include')
 			},
 			dist: {
 				lib: path.join(userConfig.distDir, './lib'),

@@ -12,20 +12,25 @@ let reload;
 
 let watchHandle = function(type, file) {
 	let ext = file.match(/.*\.{1}([^.]*)$/) ? file.match(/.*\.{1}([^.]*)$/)[1] : null,
+		compileExt,
 		delfile = function() {
-			del(file.replace(new RegExp(globalConfig.projectDir), globalConfig.distDir)).then(function(paths) {
+			let delfilepath = file.replace(new RegExp(globalConfig.projectDir), globalConfig.distDir);
+			if (compileExt === 'css' || compileExt === 'js') {
+				delfilepath = delfilepath.replace('.' + ext, '.' + compileExt);
+			}
+			del(delfilepath).then(function(paths) {
 				console.log('已删除:\n', paths.join('\n'));
 			});
 		};
 	for (let key in types) {
 		if (types.hasOwnProperty(key)) {
 			if (types[key].indexOf(ext) > -1) {
-				ext = key;
+				compileExt = key;
 				break;
 			}
 		}
 	}
-	switch (ext) {
+	switch (compileExt) {
 		case 'script':
 			if (file.indexOf('\\lib\\') > -1 || file.indexOf('seajs.config') > -1) {
 				buildCore.scriptLib(file, type === 'add' ? null : reload);

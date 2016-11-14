@@ -42,14 +42,18 @@ const insertBeforeStr = function(fileContents, search, str){
         return fileContents;
     }
 }
-let spinner = ora('正在构建...').start();
+
 //全局组件缓存
 let widgets = {};
-let getWidget = function(widgetName, type, page) {
+let getWidget = function(widgetName, type, page, isPath) {
 	let includePath = path.join(globalConfig.paths.include, widgetName);
 	let result;
 	let sourcePath;
-
+	if(isPath){
+		includePath = path.join(globalConfig.projectDir, widgetName);
+	}else{
+		includePath = path.join(globalConfig.paths.include, widgetName);
+	}
 	if (!(/\.html$/).test(widgetName)) {
 		switch (type) {
 			case "temp":
@@ -97,6 +101,9 @@ let getWidget = function(widgetName, type, page) {
 	return result;
 };
 
+const isIncludeReg = /include\\([^\\]+)\\|include\\([^\\\.]+)\..+/;
+let spinner = ora('正在构建...').start();
+
 const scriptLib = function(filePath, callback) {
 
 	gulp.src(globalConfig.paths.scriptLib)
@@ -105,7 +112,7 @@ const scriptLib = function(filePath, callback) {
 
 	gulp.src(globalConfig.paths.scriptConcat)
 		.pipe(concat('sea.js'))
-		.pipe(replace('__folder', '/' + globalConfig.distDir))
+		.pipe(replace(globalConfig.distHolder, '/' + globalConfig.distDir))
 		.pipe(gulp.dest(globalConfig.dist.lib))
 		.on('end', function() {
 			if (typeof(callback) === 'function') {
@@ -141,7 +148,7 @@ let script = function(filePath, callback) {
 			}
 		};
 	if (filePath && filePath.split) {
-		var widgetMatch = filePath.match(/include\\([^\\]+)\\script.js/);
+		var widgetMatch = filePath.match(isIncludeReg);
 		if (widgetMatch) {
 			if (widgets[widgetMatch[1]]) {
 				//更新对应页面
@@ -197,35 +204,32 @@ let css = function(filePath, callback) {
 		}
 	}
 	if (filePath && filePath.split) {
-		var widgetMatch = filePath.match(/include\\([^\\]+)\\style.less/);
-		if (widgetMatch) {
+		var widgetMatch = filePath.match(isIncludeReg);
+		if (Array.isArray(widgetMatch)) {
 			if (widgets[widgetMatch[1]]) {
 				getWidget(widgetMatch[1], 'style', true);
-				if (widgets[widgetMatch[1]].alise.length > 1) {
-					mainTarget = globalConfig.paths.css;
-					//更新css缓存
-					needRefresh = true;
-				} else {
-					//更新对应页面
-					return html(widgets[widgetMatch[1]].alise, callback);
-				}
+				mainTarget = globalConfig.paths.cssMain;
+				//更新css缓存
+				needRefresh = true;
 			}
 		} else if (filePath.indexOf(path.normalize(path.join(globalConfig.projectDir,'/css/')))>-1) {
 			//匹配 css
-			mainTarget = globalConfig.paths.css;
+			mainTarget = globalConfig.paths.cssMain;
 		} else {
 			//其他
 			otherTarget = filePath;
 		}
 	} else {
-		mainTarget = globalConfig.paths.css;
-		otherTarget = globalConfig.paths.cssAll;
+		mainTarget = globalConfig.paths.cssMain;
+		otherTarget = globalConfig.paths.cssOther;
 	}
+
 	if (otherTarget) {
 		let destTarget = globalConfig.distDir;
 		if(otherTarget.split){
-			let destmatch = otherTarget.match(/_src\\([^\\]+)\\style.less/);
-			if(destmatch){
+			let getpathreg = new RegExp(globalConfig.projectDir + '\\\\([^\\\\]+)\\\\.+\\.[^\\.]+');
+			let destmatch = otherTarget.match(getpathreg);
+			if(Array.isArray(destmatch)){
 				destTarget = path.join(destTarget,'/'+destmatch[1]);
 			}
 		}
@@ -234,7 +238,7 @@ let css = function(filePath, callback) {
 				plugins: [autoprefix],
 				compress: true
 			}))
-			.pipe(replace('__folder', '/' + globalConfig.distDir))
+			.pipe(replace(globalConfig.distHolder, '/' + globalConfig.distDir))
 			.pipe(gulp.dest(destTarget));
 	}
 	if (mainTarget) {
@@ -259,7 +263,7 @@ let css = function(filePath, callback) {
 				plugins: [autoprefix],
 				compress: true
 			}))
-			.pipe(replace('__folder', '/' + globalConfig.distDir))
+			.pipe(replace(globalConfig.distHolder, '/' + globalConfig.distDir))
 			.pipe(sourcemaps.write('./maps'))
 			.pipe(gulp.dest(globalConfig.dist.css))
 			.on('end', function() {
@@ -274,7 +278,7 @@ let html = function(filePath, callback) {
 	let compileTarget;
 	if (filePath) {
 		if (filePath.split) {
-			var widgetMatch = filePath.match(/include\\([^\\]+)\\temp.html|include\\([^\\\.]+\.html)/);
+			var widgetMatch = filePath.match(isIncludeReg);
 			if (widgetMatch) {
 				//1.include
 				if (widgets[widgetMatch[1]]) {
@@ -307,14 +311,14 @@ let html = function(filePath, callback) {
 			let matches = content.match(/^(\s+)?(\/\/|\/\*|\#|\<\!\-\-)(\s+)?=(\s+)?(include|require)(.+$)/mg);
 			//页面级组件缓存
 			let pageWidget = {};
-			let getPageWidget = function(name, type, refresh) {
+			let getPageWidget = function(name, type, refresh, isPath) {
 				let result;
 				if (refresh) {
-					result = getWidget(name, type, true);
+					result = getWidget(name, type, true, isPath);
 				} else if (pageWidget[name] && pageWidget[name][type]) {
 					result = pageWidget[name][type];
 				} else {
-					result = getWidget(name, type, file.path);
+					result = getWidget(name, type, file.path, isPath);
 					if (pageWidget[name]) {
 						pageWidget[name][type] = result;
 					} else {
@@ -324,21 +328,25 @@ let html = function(filePath, callback) {
 				}
 				return result;
 			};
-
-			for (let i = 0, l = matches.length; i < l; i++) {
-				let matchStr = matches[i].trim();
-				let includeCommand = matchStr
-					.replace(/(\/\/|\/\*|\#|<!--)(\s+)?=(\s+)?/g, "")
-					.replace(/(\*\/|-->)$/g, "")
-					.replace(/['"]/g, "")
-					.split(' ');
-				let includeName = includeCommand[1];
-				if (includeCommand[0] === 'require') {
-					let widgetHTML = getPageWidget(includeName, 'temp');
-					content = content.replace(matchStr, widgetHTML);
-					if (!(/\.html$/).test(includeName)) {
-						getPageWidget(includeName, 'style');
-						getPageWidget(includeName, 'script');
+			if(Array.isArray(matches)){
+				for (let i = 0, l = matches.length; i < l; i++) {
+					let matchStr = matches[i].trim();
+					let includeCommand = matchStr
+						.replace(/(\/\/|\/\*|\#|<!--)(\s+)?=(\s+)?/g, "")
+						.replace(/(\*\/|-->)$/g, "")
+						.replace(/['"]/g, "")
+						.split(' ');
+					let includeName = includeCommand[1];
+					if (includeCommand[0] === 'require') {
+						let widgetHTML = getPageWidget(includeName, 'temp');
+						content = content.replace(matchStr, widgetHTML);
+						if (!(/\.html$/).test(includeName)) {
+							getPageWidget(includeName, 'style');
+							getPageWidget(includeName, 'script');
+						}
+					}else if(includeCommand[0] === 'include'){
+						let widgetHTML = getPageWidget(includeName, 'temp', false, true);
+						content = content.replace(matchStr, widgetHTML);
 					}
 				}
 			}
@@ -378,7 +386,7 @@ seajs.use("${x}-script-inline");
 			file.contents = Buffer.from(content);
 			return file;
 		}))
-		.pipe(replace('__folder', '/' + globalConfig.distDir))
+		.pipe(replace(globalConfig.distHolder, '/' + globalConfig.distDir))
 		.pipe(gulp.dest(globalConfig.dist.html))
 		.on('end', function() {
 			if (!filePath) {
