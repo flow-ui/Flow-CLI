@@ -124,6 +124,7 @@ const scriptLib = function(filePath, callback) {
 const scriptApp = function(filePath, callback) {
 	gulp.src(globalConfig.paths.scriptApp)
 		.pipe(changed(globalConfig.dist.js))
+		.pipe(replace(globalConfig.distHolder, '/' + globalConfig.distDir))
 		.pipe(gulp.dest(globalConfig.dist.js))
 		.on('end', function() {
 			if (typeof(callback) === 'function') {
