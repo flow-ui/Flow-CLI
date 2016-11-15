@@ -10,6 +10,7 @@ const autoprefix = new LessAutoprefix();
 const sourcemaps = require('gulp-sourcemaps');
 const concat = require('gulp-concat');
 const changed = require('gulp-changed');
+const uglify = require('gulp-uglify');
 const globalConfig = require('./paths')();
 const ora = require('ora');
 const tap = require('gulp-tap');
@@ -106,11 +107,13 @@ let spinner = ora('正在构建...').start();
 const scriptLib = function(filePath, callback) {
 	gulp.src(globalConfig.paths.scriptLib)
 		.pipe(changed(globalConfig.dist.lib))
+		.pipe(uglify())
 		.pipe(gulp.dest(globalConfig.dist.lib));
 
 	gulp.src(globalConfig.paths.scriptConcat)
 		.pipe(concat('sea.js'))
 		.pipe(replace(globalConfig.distHolder, globalConfig.distDir))
+		.pipe(uglify())
 		.pipe(gulp.dest(globalConfig.dist.lib))
 		.on('end', function() {
 			if (typeof(callback) === 'function') {
