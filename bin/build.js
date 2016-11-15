@@ -41,8 +41,7 @@ const insertBeforeStr = function(fileContents, search, str){
     } else {
         return fileContents;
     }
-}
-
+};
 //全局组件缓存
 let widgets = {};
 let getWidget = function(widgetName, type, page, isPath) {
@@ -105,14 +104,13 @@ const isIncludeReg = /include\\([^\\]+)\\|include\\([^\\\.]+)\..+/;
 let spinner = ora('正在构建...').start();
 
 const scriptLib = function(filePath, callback) {
-
 	gulp.src(globalConfig.paths.scriptLib)
 		.pipe(changed(globalConfig.dist.lib))
 		.pipe(gulp.dest(globalConfig.dist.lib));
 
 	gulp.src(globalConfig.paths.scriptConcat)
 		.pipe(concat('sea.js'))
-		.pipe(replace(globalConfig.distHolder, '/' + globalConfig.distDir))
+		.pipe(replace(globalConfig.distHolder, globalConfig.distDir))
 		.pipe(gulp.dest(globalConfig.dist.lib))
 		.on('end', function() {
 			if (typeof(callback) === 'function') {
@@ -124,7 +122,7 @@ const scriptLib = function(filePath, callback) {
 const scriptApp = function(filePath, callback) {
 	gulp.src(globalConfig.paths.scriptApp)
 		.pipe(changed(globalConfig.dist.js))
-		.pipe(replace(globalConfig.distHolder, '/' + globalConfig.distDir))
+		.pipe(replace(globalConfig.distHolder, globalConfig.distDir))
 		.pipe(gulp.dest(globalConfig.dist.js))
 		.on('end', function() {
 			if (typeof(callback) === 'function') {
@@ -235,11 +233,12 @@ let css = function(filePath, callback) {
 			}
 		}
 		gulp.src(otherTarget)
+			.pipe(replace(globalConfig.projectHolder, globalConfig.projectDir))
 			.pipe(less({
 				plugins: [autoprefix],
 				compress: true
 			}))
-			.pipe(replace(globalConfig.distHolder, '/' + globalConfig.distDir))
+			.pipe(replace(globalConfig.distHolder, globalConfig.distDir))
 			.pipe(gulp.dest(destTarget));
 	}
 	if (mainTarget) {
@@ -260,11 +259,12 @@ let css = function(filePath, callback) {
 				return file;
 			}))
 			.pipe(sourcemaps.init())
+			.pipe(replace(globalConfig.projectHolder, globalConfig.projectDir))
 			.pipe(less({
 				plugins: [autoprefix],
 				compress: true
 			}))
-			.pipe(replace(globalConfig.distHolder, '/' + globalConfig.distDir))
+			.pipe(replace(globalConfig.distHolder, globalConfig.distDir))
 			.pipe(sourcemaps.write('./maps'))
 			.pipe(gulp.dest(globalConfig.dist.css))
 			.on('end', function() {
@@ -387,7 +387,7 @@ seajs.use("${x}-script-inline");
 			file.contents = Buffer.from(content);
 			return file;
 		}))
-		.pipe(replace(globalConfig.distHolder, '/' + globalConfig.distDir))
+		.pipe(replace(globalConfig.distHolder, globalConfig.distDir))
 		.pipe(gulp.dest(globalConfig.dist.html))
 		.on('end', function() {
 			if (!filePath) {
