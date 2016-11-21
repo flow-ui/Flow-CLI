@@ -83,7 +83,7 @@ let watchHandle = function(type, file) {
 
 let run = function() {
 	let watcher = watch(globalConfig.projectDir);
-
+	let freshTimer = 0;
 	buildCore.build(function() {
 		browserSync.init({
 			server: {
@@ -96,7 +96,8 @@ let run = function() {
 			logLevel: "silent"
 		}, function() {
 			reload = function() {
-				console.log('浏览器刷新...');
+				spinner.text = ('浏览器刷新(' + gutil.colors.magenta(++freshTimer) + ')');
+				spinner.render();
 				browserSync.reload();
 			};
 			console.log(

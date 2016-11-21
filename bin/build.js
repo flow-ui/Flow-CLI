@@ -157,6 +157,10 @@ let script = function(filePath, callback) {
 				getWidget(widgetMatch[1], 'script', true);
 				return html(widgets[widgetMatch[1]].alise, callback);
 			}
+		}else if(filePath.indexOf(path.normalize('modules/'))>-1){
+			return console.log('\n请打开 ' + 
+				gutil.colors.cyan(globalConfig.projectDir+'/lib/seajs/manifest.js') +
+				' 更新对应模块');
 		}
 	}
 
@@ -214,7 +218,7 @@ let css = function(filePath, callback) {
 				//更新css缓存
 				needRefresh = true;
 			}
-		} else if (filePath.indexOf(path.normalize(path.join(globalConfig.projectDir,'/css/')))>-1) {
+		} else if (filePath.indexOf(path.normalize(path.join(globalConfig.projectDir,'/css/')))>-1 || filePath.indexOf(path.normalize('_component/'))>-1) {
 			//匹配 css
 			mainTarget = globalConfig.paths.cssMain;
 		} else {
