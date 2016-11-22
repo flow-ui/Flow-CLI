@@ -14,6 +14,11 @@ const uglify = require('gulp-uglify');
 const globalConfig = require('./paths')();
 const ora = require('ora');
 const tap = require('gulp-tap');
+const pkg = require('../package.json');
+const npmview = require('npmview');
+const repl = require('repl');
+let spinner = ora();
+
 const isExist = function(dir) {
 	try {
 		return fs.statSync(dir).isDirectory() || fs.statSync(dir).isFile();
@@ -32,16 +37,16 @@ const isContain = function(arr, str) {
 	}
 	return false;
 };
-const insertBeforeStr = function(fileContents, search, str){
-    let index, start, end;
-    index = fileContents.indexOf(search);
-    if(index > -1){
-        start = fileContents.substr(0, index);
-        end = fileContents.substr(index);
-        return start + str + end;
-    } else {
-        return fileContents;
-    }
+const insertBeforeStr = function(fileContents, search, str) {
+	let index, start, end;
+	index = fileContents.indexOf(search);
+	if (index > -1) {
+		start = fileContents.substr(0, index);
+		end = fileContents.substr(index);
+		return start + str + end;
+	} else {
+		return fileContents;
+	}
 };
 //全局组件缓存
 let widgets = {};
@@ -49,9 +54,9 @@ let getWidget = function(widgetName, type, page, isPath) {
 	let includePath = path.join(globalConfig.paths.include, widgetName);
 	let result;
 	let sourcePath;
-	if(isPath){
+	if (isPath) {
 		includePath = path.join(globalConfig.projectDir, widgetName);
-	}else{
+	} else {
 		includePath = path.join(globalConfig.paths.include, widgetName);
 	}
 	if (!(/\.html$/).test(widgetName)) {
@@ -102,7 +107,6 @@ let getWidget = function(widgetName, type, page, isPath) {
 };
 
 const isIncludeReg = /include\\([^\\]+)\\|include\\([^\\\.]+)\..+/;
-let spinner = ora('正在构建...').start();
 
 const scriptLib = function(filePath, callback) {
 	gulp.src(globalConfig.paths.scriptLib)
@@ -157,9 +161,9 @@ let script = function(filePath, callback) {
 				getWidget(widgetMatch[1], 'script', true);
 				return html(widgets[widgetMatch[1]].alise, callback);
 			}
-		}else if(filePath.indexOf(path.normalize('modules/'))>-1){
-			return console.log('\n请打开 ' + 
-				gutil.colors.cyan(globalConfig.projectDir+'/lib/seajs/manifest.js') +
+		} else if (filePath.indexOf(path.normalize('modules/')) > -1) {
+			return console.log('\n请打开 ' +
+				gutil.colors.cyan(globalConfig.projectDir + '/lib/seajs/manifest.js') +
 				' 更新对应模块');
 		}
 	}
@@ -218,7 +222,7 @@ let css = function(filePath, callback) {
 				//更新css缓存
 				needRefresh = true;
 			}
-		} else if (filePath.indexOf(path.normalize(path.join(globalConfig.projectDir,'/css/')))>-1 || filePath.indexOf(path.normalize('_component/'))>-1) {
+		} else if (filePath.indexOf(path.normalize(path.join(globalConfig.projectDir, '/css/'))) > -1 || filePath.indexOf(path.normalize('_component/')) > -1) {
 			//匹配 css
 			mainTarget = globalConfig.paths.cssMain;
 		} else {
@@ -232,11 +236,11 @@ let css = function(filePath, callback) {
 
 	if (otherTarget) {
 		let destTarget = globalConfig.distDir;
-		if(otherTarget.split){
+		if (otherTarget.split) {
 			let getpathreg = new RegExp(globalConfig.projectDir + '\\\\([^\\\\]+)\\\\.+\\.[^\\.]+');
 			let destmatch = otherTarget.match(getpathreg);
-			if(Array.isArray(destmatch)){
-				destTarget = path.join(destTarget,'/'+destmatch[1]);
+			if (Array.isArray(destmatch)) {
+				destTarget = path.join(destTarget, '/' + destmatch[1]);
 			}
 		}
 		gulp.src(otherTarget)
@@ -336,7 +340,7 @@ let html = function(filePath, callback) {
 				}
 				return result;
 			};
-			if(Array.isArray(matches)){
+			if (Array.isArray(matches)) {
 				for (let i = 0, l = matches.length; i < l; i++) {
 					let matchStr = matches[i].trim();
 					let includeCommand = matchStr
@@ -352,7 +356,7 @@ let html = function(filePath, callback) {
 							getPageWidget(includeName, 'style');
 							getPageWidget(includeName, 'script');
 						}
-					}else if(includeCommand[0] === 'include'){
+					} else if (includeCommand[0] === 'include') {
 						let widgetHTML = getPageWidget(includeName, 'temp', false, true);
 						content = content.replace(matchStr, widgetHTML);
 					}
@@ -387,7 +391,7 @@ seajs.use("${x}-script-inline");
 					}
 				}
 			}
-			if(scriptWrap!=='<script>'){
+			if (scriptWrap !== '<script>') {
 				scriptWrap += '</script>';
 				content += scriptWrap;
 			}
@@ -428,14 +432,51 @@ let build = function(callback) {
 					process.exit();
 				}
 			}
+		},
+		startBuild = function(){
+			spinner.text = '正在构建...';
+			spinner.start();
+			build.prototype.todoList.forEach(function(item, index) {
+				item(null, resolve);
+			});
 		};
 	if (!isExist(path.join('./', globalConfig.projectDir))) {
 		console.log(globalConfig.projectDir + '不存在！');
 		return process.exit();
 	}
-
-	build.prototype.todoList.forEach(function(item, index) {
-		item(null, resolve);
+	if(!globalConfig.checkUpdate){
+		return startBuild();	
+	}
+	npmview(pkg.name, function(err, version, moduleInfo) {
+		let newV = version.split('.'),
+			nowV = pkg.version.split('.'),
+			hasUp;
+		if (err) {
+			console.error(err);
+			return startBuild();
+		}
+		newV.forEach(function(e, i) {
+			if (e > nowV[i]) {
+				hasUp = true;
+				return false;
+			}
+		});
+		if (hasUp) {
+			let myEval = function (cmd, context, filename, callback) {
+				r.close();
+				if (cmd && (cmd.toUpperCase().trim() === 'Y')) {
+					startBuild();
+				} else {
+					process.exit();
+				}
+			}
+			let r = repl.start({
+				prompt: '> 发现新版本' + gutil.colors.magenta(version) + ',继续编译?(Y/N)',
+				eval: myEval
+			});
+		} else {
+			startBuild();
+		}
 	});
 };
 build.prototype.todoList = [script, image, font, html];
