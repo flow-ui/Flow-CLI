@@ -91,7 +91,8 @@ let run = function() {
 				directory: true
 			},
 			startPath: globalConfig.distDir + "/" + globalConfig.homePage,
-			reloadDelay: 0,
+			reloadDelay: globalConfig.reloadDelay,
+			reloadDebounce: globalConfig.reloadDelay,
 			port: globalConfig.port,
 			logLevel: "silent"
 		}, function() {
