@@ -19,6 +19,7 @@ const npmview = require('npmview');
 const repl = require('repl');
 let spinner = ora();
 
+const distHolderFinal = globalConfig.serverRoot ? (globalConfig.serverRoot + '/' + globalConfig.distDir) : globalConfig.distDir;
 const isExist = function(dir) {
 	try {
 		return fs.statSync(dir).isDirectory() || fs.statSync(dir).isFile();
@@ -116,7 +117,8 @@ const scriptLib = function(filePath, callback) {
 
 	gulp.src(globalConfig.paths.scriptConcat)
 		.pipe(concat('sea.js'))
-		.pipe(replace(globalConfig.distHolder, globalConfig.distDir))
+		.pipe(replace(globalConfig.rootHolder, globalConfig.serverRoot))
+		.pipe(replace(globalConfig.distHolder, distHolderFinal))
 		.pipe(uglify())
 		.pipe(gulp.dest(globalConfig.dist.lib))
 		.on('end', function() {
@@ -129,7 +131,7 @@ const scriptLib = function(filePath, callback) {
 const scriptApp = function(filePath, callback) {
 	gulp.src(globalConfig.paths.scriptApp)
 		.pipe(changed(globalConfig.dist.js))
-		.pipe(replace(globalConfig.distHolder, globalConfig.distDir))
+		.pipe(replace(globalConfig.distHolder, distHolderFinal))
 		.pipe(gulp.dest(globalConfig.dist.js))
 		.on('end', function() {
 			if (typeof(callback) === 'function') {
@@ -249,7 +251,7 @@ let css = function(filePath, callback) {
 				plugins: [autoprefix],
 				compress: true
 			}))
-			.pipe(replace(globalConfig.distHolder, globalConfig.distDir))
+			.pipe(replace(globalConfig.distHolder, distHolderFinal))
 			.pipe(gulp.dest(destTarget));
 	}
 	if (mainTarget) {
@@ -275,7 +277,7 @@ let css = function(filePath, callback) {
 				plugins: [autoprefix],
 				compress: true
 			}))
-			.pipe(replace(globalConfig.distHolder, globalConfig.distDir))
+			.pipe(replace(globalConfig.distHolder, distHolderFinal))
 			.pipe(sourcemaps.write('./maps'))
 			.pipe(gulp.dest(globalConfig.dist.css))
 			.on('end', function() {
@@ -398,7 +400,7 @@ seajs.use("${x}-script-inline");
 			file.contents = Buffer.from(content);
 			return file;
 		}))
-		.pipe(replace(globalConfig.distHolder, globalConfig.distDir))
+		.pipe(replace(globalConfig.distHolder, distHolderFinal))
 		.pipe(gulp.dest(globalConfig.dist.html))
 		.on('end', function() {
 			if (!filePath) {
