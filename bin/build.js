@@ -1,3 +1,4 @@
+const util = require('./util');
 const fs = require('fs');
 const path = require('path');
 const gulp = require('gulp');
@@ -20,35 +21,7 @@ const repl = require('repl');
 let spinner = ora();
 
 const distHolderFinal = globalConfig.serverRoot ? (globalConfig.serverRoot + '/' + globalConfig.distDir) : globalConfig.distDir;
-const isExist = function(dir) {
-	try {
-		return fs.statSync(dir).isDirectory() || fs.statSync(dir).isFile();
-	} catch (e) {
-		if (e.code != 'ENOENT')
-			throw e;
-		return false;
-	}
-};
-const isContain = function(arr, str) {
-	let i = arr.length;
-	while (i--) {
-		if (arr[i] === str) {
-			return true;
-		}
-	}
-	return false;
-};
-const insertBeforeStr = function(fileContents, search, str) {
-	let index, start, end;
-	index = fileContents.indexOf(search);
-	if (index > -1) {
-		start = fileContents.substr(0, index);
-		end = fileContents.substr(index);
-		return start + str + end;
-	} else {
-		return fileContents;
-	}
-};
+
 //全局组件缓存
 let widgets = {};
 let getWidget = function(widgetName, type, page, isPath) {
@@ -83,11 +56,11 @@ let getWidget = function(widgetName, type, page, isPath) {
 	}
 	if (sourcePath === (widgetName + 'alise')) {
 		result = widgets[widgetName] ? widgets[widgetName].alise.length : 0;
-	} else if (isExist(sourcePath)) {
+	} else if (util.isExist(sourcePath)) {
 		if (widgets[widgetName]) {
 			if (page.split && widgets[widgetName][type]) {
 				result = widgets[widgetName][type];
-				if (!isContain(widgets[widgetName].alise, page)) {
+				if (!util.isContain(widgets[widgetName].alise, page)) {
 					widgets[widgetName].alise.push(page);
 				}
 			} else {
@@ -325,7 +298,7 @@ let html = function(filePath, callback) {
 			let matches = content.match(/^(\s+)?(\/\/|\/\*|\#|\<\!\-\-)(\s+)?=(\s+)?(include|require)(.+$)/mg);
 			//页面级组件缓存
 			let pageWidget = {};
-			let getPageWidget = function(name, type, refresh, isPath) {
+			let getPageWidget = function(name, type, refresh, isPath, uuid) {
 				let result;
 				if (refresh) {
 					result = getWidget(name, type, true, isPath);
@@ -333,7 +306,10 @@ let html = function(filePath, callback) {
 					result = pageWidget[name][type];
 				} else {
 					result = getWidget(name, type, file.path, isPath);
-					if (pageWidget[name]) {
+					if(type==='script' && uuid && uuid.split){
+						pageWidget[name+uuid] = {};
+						pageWidget[name+uuid][type] = result.replace(globalConfig.UUIDHolder, uuid);
+					}else if (pageWidget[name]) {
 						pageWidget[name][type] = result;
 					} else {
 						pageWidget[name] = {};
@@ -348,17 +324,38 @@ let html = function(filePath, callback) {
 					let includeCommand = matchStr
 						.replace(/(\/\/|\/\*|\#|<!--)(\s+)?=(\s+)?/g, "")
 						.replace(/(\*\/|-->)$/g, "")
-						.replace(/['"]/g, "")
 						.split(' ');
 					let includeName = includeCommand[1];
+					let widgetData = includeCommand[2];
+					let widgetUUID;
 					if (includeCommand[0] === 'require') {
+						//加载组件
+						let uuid;
 						let widgetHTML = getPageWidget(includeName, 'temp');
+						//使用_.template编译模板
+						try{
+							let _tempdata = {};
+							if(widgetData){
+								_tempdata = JSON.parse(widgetData);
+							}
+							_tempdata.file = file;	//不知道为什么gulp-util要求_.template数据必须含有file对象
+							widgetHTML = gutil.template(widgetHTML, _tempdata);
+						}catch(e){
+							widgetHTML = '';
+							console.log('\n> 组件['+gutil.colors.red(includeName)+']编译出错，请检查模板数据，详情参考_.template文档');
+						}
+
 						content = content.replace(matchStr, widgetHTML);
+						if(widgetHTML.indexOf(globalConfig.UUIDHolder)>-1){
+							widgetUUID = util.getUUID();
+							content = content.replace(globalConfig.UUIDHolder, widgetUUID);
+						}
 						if (!(/\.html$/).test(includeName)) {
-							getPageWidget(includeName, 'style');
-							getPageWidget(includeName, 'script');
+							getPageWidget(includeName, 'style', false, false, widgetUUID);
+							getPageWidget(includeName, 'script', false, false, widgetUUID);
 						}
 					} else if (includeCommand[0] === 'include') {
+						//include 文件
 						let widgetHTML = getPageWidget(includeName, 'temp', false, true);
 						content = content.replace(matchStr, widgetHTML);
 					}
@@ -367,7 +364,7 @@ let html = function(filePath, callback) {
 			//清理 widgets
 			for (let x in widgets) {
 				if (widgets.hasOwnProperty(x)) {
-					if (isContain(widgets[x].alise, file.path) && !pageWidget[x]) {
+					if (util.isContain(widgets[x].alise, file.path) && !pageWidget[x]) {
 						let _ = widgets[x].alise;
 						widgets[x].alise.forEach(function(page, i) {
 							if (page === file.path) {
@@ -435,19 +432,19 @@ let build = function(callback) {
 				}
 			}
 		},
-		startBuild = function(){
+		startBuild = function() {
 			spinner.text = '正在构建...';
 			spinner.start();
 			build.prototype.todoList.forEach(function(item, index) {
 				item(null, resolve);
 			});
 		};
-	if (!isExist(path.join('./', globalConfig.projectDir))) {
+	if (!util.isExist(path.join('./', globalConfig.projectDir))) {
 		console.log(globalConfig.projectDir + '不存在！');
 		return process.exit();
 	}
-	if(!globalConfig.checkUpdate){
-		return startBuild();	
+	if (!globalConfig.checkUpdate) {
+		return startBuild();
 	}
 	npmview(pkg.name, function(err, version, moduleInfo) {
 		let newV = version.split('.'),
@@ -464,7 +461,7 @@ let build = function(callback) {
 			}
 		});
 		if (hasUp) {
-			let myEval = function (cmd, context, filename, callback) {
+			let myEval = function(cmd, context, filename, callback) {
 				r.close();
 				if (cmd && (cmd.toUpperCase().trim() === 'Y')) {
 					startBuild();

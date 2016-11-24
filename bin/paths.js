@@ -1,14 +1,7 @@
+const util = require('./util');
 const fs = require('fs');
 const path = require('path');
-const isExist = function(file) {
-	try {
-		return fs.statSync(file).isFile();
-	} catch (e) {
-		if (e.code != 'ENOENT')
-			throw e;
-		return false;
-	}
-};
+
 const configFile = path.join(process.cwd(), './config.json');
 const types = {
 	script: 'js,coffee',
@@ -18,7 +11,7 @@ const types = {
 	font: 'eot,svg,ttf,woff'
 };
 const getPath = function() {
-	if (isExist(configFile)) {
+	if (util.isExist(configFile)) {
 		let userConfig = require(configFile);
 		let globalConfig = {
 			types: types,
