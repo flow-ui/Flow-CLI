@@ -1,5 +1,4 @@
 const util = require('./util');
-const fs = require('fs');
 const path = require('path');
 const gulp = require('gulp');
 const gutil = require('gulp-util');
@@ -64,11 +63,11 @@ let getWidget = function(widgetName, type, page, isPath) {
 					widgets[widgetName].alise.push(page);
 				}
 			} else {
-				result = fs.readFileSync(sourcePath).toString().trim();
+				result = util.readFileSync(sourcePath);
 				widgets[widgetName][type] = result;
 			}
 		} else {
-			result = fs.readFileSync(sourcePath).toString().trim();
+			result = util.readFileSync(sourcePath);
 			widgets[widgetName] = {
 				alise: [page]
 			};

@@ -1,5 +1,4 @@
 const util = require('./util');
-const fs = require('fs');
 const path = require('path');
 
 const configFile = path.join(process.cwd(), './config.json');
