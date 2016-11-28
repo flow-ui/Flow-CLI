@@ -335,7 +335,7 @@ let html = function(filePath, callback) {
 						let uuid;
 						let widgetHTML = getPageWidget(includeName, 'temp');
 						//使用_.template编译模板
-						if(widgetData.split && widgetData.trim()){
+						if(widgetData && widgetData.trim()){
 							let _tempdata = JSON.parse(widgetData);
 							_tempdata.file = file;	//不知道为什么gulp-util要求_.template数据必须含有file对象
 							try{
@@ -469,7 +469,7 @@ let build = function(callback) {
 				}
 			}
 			let r = repl.start({
-				prompt: '> 发现新版本' + gutil.colors.magenta(version) + ',继续编译(Y/N)?',
+				prompt: '> 发现新版本' + gutil.colors.magenta(version) + ',继续编译?(Y/N)',
 				eval: myEval
 			});
 		} else {
