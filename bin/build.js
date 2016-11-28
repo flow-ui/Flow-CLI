@@ -2,6 +2,7 @@ const util = require('./util');
 const path = require('path');
 const gulp = require('gulp');
 const gutil = require('gulp-util');
+const plumber = require('gulp-plumber');
 const replace = require('gulp-replace');
 const imagemin = require('gulp-imagemin');
 const less = require('gulp-less');
@@ -218,6 +219,7 @@ let css = function(filePath, callback) {
 			}
 		}
 		gulp.src(otherTarget)
+			.pipe(plumber())
 			.pipe(replace(globalConfig.projectHolder, globalConfig.projectDir))
 			.pipe(less({
 				plugins: [autoprefix],
@@ -228,6 +230,7 @@ let css = function(filePath, callback) {
 	}
 	if (mainTarget) {
 		gulp.src(mainTarget)
+			.pipe(plumber())
 			.pipe(tap(function(file) {
 				let content = file.contents.toString();
 				let importHTML = '';
@@ -332,18 +335,15 @@ let html = function(filePath, callback) {
 						let uuid;
 						let widgetHTML = getPageWidget(includeName, 'temp');
 						//使用_.template编译模板
-						try{
-							let _tempdata = {};
-							if(widgetData){
-								_tempdata = JSON.parse(widgetData);
-							}
+						if(widgetData.split && widgetData.trim()){
+							let _tempdata = JSON.parse(widgetData);
 							_tempdata.file = file;	//不知道为什么gulp-util要求_.template数据必须含有file对象
-							widgetHTML = gutil.template(widgetHTML, _tempdata);
-						}catch(e){
-							widgetHTML = '';
-							console.log('\n> 组件['+gutil.colors.red(includeName)+']编译出错，请检查模板数据，详情参考_.template文档');
+							try{
+								widgetHTML = gutil.template(widgetHTML, _tempdata);
+							}catch(e){
+								console.log('\n> 组件['+gutil.colors.red(includeName)+']编译出错，请检查模板数据，详情参考_.template文档');
+							}
 						}
-
 						content = content.replace(matchStr, widgetHTML);
 						if(widgetHTML.indexOf(globalConfig.UUIDHolder)>-1){
 							widgetUUID = util.getUUID();
