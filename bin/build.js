@@ -469,7 +469,7 @@ let build = function(callback) {
 				}
 			}
 			let r = repl.start({
-				prompt: '> 发现新版本' + gutil.colors.magenta(version) + ',继续编译?(Y/N)',
+				prompt: '> 发现新版本' + gutil.colors.magenta(version) + ',继续编译(Y/N)?',
 				eval: myEval
 			});
 		} else {
