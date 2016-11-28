@@ -85,14 +85,14 @@ const isIncludeReg = /include\\([^\\]+)\\|include\\([^\\\.]+)\..+/;
 const scriptLib = function(filePath, callback) {
 	gulp.src(globalConfig.paths.scriptLib)
 		.pipe(changed(globalConfig.dist.lib))
-		.pipe(uglify())
+		.pipe(globalConfig.compress ? uglify() : gutil.noop())
 		.pipe(gulp.dest(globalConfig.dist.lib));
 
 	gulp.src(globalConfig.paths.scriptConcat)
 		.pipe(concat('sea.js'))
 		.pipe(replace(globalConfig.rootHolder, globalConfig.serverRoot))
 		.pipe(replace(globalConfig.distHolder, distHolderFinal))
-		.pipe(uglify())
+		.pipe(globalConfig.compress ? uglify() : gutil.noop())
 		.pipe(gulp.dest(globalConfig.dist.lib))
 		.on('end', function() {
 			if (typeof(callback) === 'function') {
@@ -208,7 +208,6 @@ let css = function(filePath, callback) {
 		mainTarget = globalConfig.paths.cssMain;
 		otherTarget = globalConfig.paths.cssOther;
 	}
-
 	if (otherTarget) {
 		let destTarget = globalConfig.distDir;
 		if (otherTarget.split) {
@@ -223,7 +222,7 @@ let css = function(filePath, callback) {
 			.pipe(replace(globalConfig.projectHolder, globalConfig.projectDir))
 			.pipe(less({
 				plugins: [autoprefix],
-				compress: true
+				compress: globalConfig.compress
 			}))
 			.pipe(replace(globalConfig.distHolder, distHolderFinal))
 			.pipe(gulp.dest(destTarget));
@@ -246,14 +245,14 @@ let css = function(filePath, callback) {
 				file.contents = Buffer.from(content);
 				return file;
 			}))
-			.pipe(sourcemaps.init())
+			.pipe(globalConfig.compress ? sourcemaps.init() : gutil.noop())
 			.pipe(replace(globalConfig.projectHolder, globalConfig.projectDir))
 			.pipe(less({
 				plugins: [autoprefix],
-				compress: true
+				compress: globalConfig.compress
 			}))
 			.pipe(replace(globalConfig.distHolder, distHolderFinal))
-			.pipe(sourcemaps.write('./maps'))
+			.pipe(globalConfig.compress ? sourcemaps.write('./maps') : gutil.noop())
 			.pipe(gulp.dest(globalConfig.dist.css))
 			.on('end', function() {
 				if (typeof(callback) === 'function') {
