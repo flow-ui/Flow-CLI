@@ -6,11 +6,11 @@
 
 ##功能
 
-1. 一键初始化、构建或启动开发环境
-2. 静态资源合并
-3. 支持less、compress、autoprefixer
-4. 前端模板引入
-5. 编辑即时刷新
+1. 初始化项目
+2. 构建中部分静态资源合并
+3. 构建中less预编译
+4. 组件化开发
+5. 实时预览服务
 6. 图片压缩
 
 ##安装
@@ -22,15 +22,15 @@
 
 ###flow init
 
-在当前目录初始化一个[front-flow](https://github.com/tower1229/front-flow-template)项目
-
-###flow run
-
-监听开发目录文件修改，并启动本地服务，实时编译预览
+在当前目录初始化一个[front-flow](https://github.com/tower1229/front-flow-template)项目模板
 
 ###flow build
 
 编译当前开发目录
+
+###flow run
+
+编译并监听开发目录，启动实时预览服务
 
 ##配置
 
