@@ -19,7 +19,9 @@ let watchHandle = function(type, file) {
 				delfilepath = delfilepath.replace('.' + ext, '.' + compileExt);
 			}
 			del(delfilepath).then(function(paths) {
-				console.log('已删除:\n', paths.join('\n'));
+				if(paths.length){
+					console.log('\ndelete:', paths.join('\n'));
+				}
 			});
 		};
 	for (let key in types) {

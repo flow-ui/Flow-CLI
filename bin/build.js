@@ -292,7 +292,10 @@ let html = function(filePath, callback) {
 		gulp.src(path.join(globalConfig.projectDir, './*.ico'))
 			.pipe(gulp.dest(globalConfig.dist.html));
 	}
-
+	if(!compileTarget){
+		//新增include模板
+		return null;
+	}
 	gulp.src(compileTarget)
 		.pipe(tap(function(file) {
 			let content = file.contents.toString();
@@ -344,7 +347,7 @@ let html = function(filePath, callback) {
 							}
 						}
 						content = content.replace(matchStr, widgetHTML);
-						if(widgetHTML.indexOf(globalConfig.UUIDHolder)>-1){
+						if(widgetHTML && widgetHTML.indexOf(globalConfig.UUIDHolder)>-1){
 							widgetUUID = util.getUUID();
 							content = content.replace(globalConfig.UUIDHolder, widgetUUID);
 						}
@@ -367,6 +370,7 @@ let html = function(filePath, callback) {
 						widgets[x].alise.forEach(function(page, i) {
 							if (page === file.path) {
 								_.splice(i, 1);
+								console.log('清理'+x);
 								return null;
 							}
 						});
