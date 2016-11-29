@@ -1,0 +1,107 @@
+.row {display: table; width: 100% + @gridGutter; transition: 0.2s width ease; *zoom: 1;}
+.row:before, .row:after { display: table; clear: both; content: '';}
+.row > [class*="span-"] {float: left; margin-right: @gridGutter; *margin-right: @gridGutter - 0.11%;}
+.generate-row(@gridColumns);
+.generate-row(@n, @i: 1) when (@i =< @n) {
+  .row > .span-@{i} { 
+	width: (@i * 100% / @n) - @gridGutter;
+  }
+  .generate-row(@n, (@i + 1));
+}
+
+/*
+* 无间距模式
+*/
+.full-row { width: 100%; transition: 0.2s width ease; *zoom: 1;}
+.full-row:before, .full-row:after { display: table; clear: both; content: '';}
+
+.full-row > [class*='span'] {float: left; }
+.generate-full-row(@gridColumns);
+.generate-full-row(@n, @i: 1) when (@i =< @n) {
+  .full-row > .span-@{i} { 
+	width: @i * 100% / @n; *width: @i * 100% / @n - 0.11%;
+  }
+  .generate-full-row(@n, (@i + 1));
+}
+
+/*
+* 工具
+*/
+.row > .pull-right, .full-row > .pull-right { float: right; }
+.row > .center { position: relative; left: -@gridGutter/2; display: block; float: none; clear: both; margin-right: auto; margin-left: auto;}
+.full-row > .center { display: block; float: none; clear: both; margin-right: auto; margin-left: auto;}
+.generate-pull-left(@gridColumns);
+.generate-pull-left(@n, @i: 1) when (@i =< @n) {
+  .pull-left-@{i} { position: relative; left: -@i * 100% / @n;}
+  .generate-pull-left(@n, (@i + 1));
+}
+.generate-pull-right(@gridColumns);
+.generate-pull-right(@n, @i: 1) when (@i =< @n) {
+  .pull-right-@{i} { position: relative; left: @i * 100% / @n;}
+  .generate-pull-right(@n, (@i + 1));
+}
+
+@media only screen and (max-device-width: @PadScreen) { 
+/*
+* 中屏
+*/
+.generate-midd-row(@gridColumns);
+.generate-midd-row(@n, @i: 1) when (@i =< @n) {
+  .row > .midd-@{i} { 
+	width: (@i * 100% / @n) - @gridGutter;
+  }
+  .generate-midd-row(@n, (@i + 1));
+}
+/*
+* 工具
+*/
+.midd-hide { display: none;}
+.midd-center { position: relative; left: -@gridGutter/2; display: block; float: none; clear: both; margin-right: auto; margin-left: auto;}//修复宽度超过100%的居中偏差
+
+/*
+* 无间距模式
+*/
+.generate-midd-full-row(@gridColumns);
+.generate-midd-full-row(@n, @i: 1) when (@i =< @n) {
+  .full-row > .midd-@{i} { 
+	width: @i * 100% / @n;
+  }
+  .generate-midd-full-row(@n, (@i + 1));
+}
+
+}
+
+@media only screen and (max-device-width: @MobileScreen) { 
+/*
+* 小屏栅格
+*/
+.generate-smal-row(@gridColumns);
+.generate-smal-row(@n, @i: 1) when (@i =< @n) {
+  .row > .smal-@{i} { 
+	width: (@i * 100% / @n) - @gridGutter;
+  }
+  .generate-smal-row(@n, (@i + 1));
+}
+/*
+* 工具
+*/
+.smal-hide { display: none;}
+.smal-show { display: block;}
+.smal-center { position: relative; left: -@gridGutter/2; display: block; float: none; clear: both; margin-right: auto; margin-left: auto;}//修复宽度超过100%的居中偏差
+
+/*
+* 清除位移
+*/
+[class*='pull-left-'], [class*='pull-right-'] { right: auto; left: auto;}
+
+/*
+* 无间距模式
+*/
+.generate-smal-full-row(@gridColumns);
+.generate-smal-full-row(@n, @i: 1) when (@i =< @n) {
+  .full-row > .smal-@{i} { 
+	width: @i * 100% / @n;
+  }
+  .generate-smal-full-row(@n, (@i + 1));
+}
+}

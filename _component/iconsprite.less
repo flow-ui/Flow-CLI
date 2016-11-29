@@ -1,0 +1,15 @@
+.ico { display: inline-block; width: @sprite-width; height: @sprite-width; 
+	white-space:nowrap; letter-spacing: -1em; text-indent: -99em; 
+    color: transparent; background: url(../img/ico.png);}
+.ico:before {content: '\3000';}
+
+.generate-sprite( @sprite-matrix );
+
+.generate-sprite(@n, @col: 0) when (@col < @n) {
+  .generate-span(@n, (@col + 1));
+  .generate-sprite(@n, (@col + 1));
+}
+.generate-span(@n, @col2: 1, @span: 1) when (@span =< @n) {
+  .ico@{col2}_@{span} { background-position: -(@span - 1) * @sprite-width -(@col2 - 1) * @sprite-width;}
+  .generate-span(@n, @col2, (@span + 1));
+}
