@@ -38,7 +38,7 @@
 
 ##文档
 
-[官方网站](http://zangtao.org/projects/front-flow-cli/)
+[官方网站](https://front-flow.github.io/front-flow-cli/docs/)
 
 ##License 
 
