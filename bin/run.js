@@ -20,7 +20,7 @@ let watchHandle = function(type, file) {
 			}
 			del(delfilepath).then(function(paths) {
 				if(paths.length){
-					console.log('\ndelete:', paths.join('\n'));
+					console.log(gutil.colors.magenta('\ndelete: ')+ paths.join(' '));
 				}
 			});
 		};
