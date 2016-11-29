@@ -44,8 +44,6 @@ let watchHandle = function(type, file) {
 				}
 			} else if (type === 'change') {
 				buildCore.script(file, reload);
-			} else {
-				console.log('script 未命中:' + file);
 			}
 			break;
 		case 'img':

@@ -80,10 +80,11 @@ let getWidget = function(widgetName, type, page, isPath) {
 	return result;
 };
 
-const isIncludeReg = /include\\([^\\]+)\\|include\\([^\\\.]+)\..+/;
+const isIncludeReg = /include\\([^\\]+)\\|include\\([^\\\.]+\..+)/;
 
 const scriptLib = function(filePath, callback) {
 	gulp.src(globalConfig.paths.scriptLib)
+		.pipe(plumber())
 		.pipe(changed(globalConfig.dist.lib))
 		.pipe(globalConfig.compress ? uglify() : gutil.noop())
 		.pipe(gulp.dest(globalConfig.dist.lib));
@@ -269,11 +270,11 @@ let html = function(filePath, callback) {
 			var widgetMatch = filePath.match(isIncludeReg);
 			if (widgetMatch) {
 				//1.include
-				if (widgets[widgetMatch[1]]) {
+				if (widgetMatch[1] && widgets[widgetMatch[1]]) {
 					//更新组件缓存
 					getWidget(widgetMatch[1], 'temp', true);
 					compileTarget = widgets[widgetMatch[1]].alise;
-				} else if (widgets[widgetMatch[2]]) {
+				} else if (widgetMatch[2] && widgets[widgetMatch[2]]) {
 					//更新链接缓存
 					getWidget(widgetMatch[2], 'temp', true);
 					compileTarget = widgets[widgetMatch[2]].alise;

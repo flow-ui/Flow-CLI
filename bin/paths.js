@@ -17,7 +17,7 @@ const getPath = function() {
 			paths: {
 				scriptConcat: [path.join(userConfig.projectDir, '/lib/seajs/sea.js'), path.join(userConfig.projectDir, '/seajs.config.js'), path.join(userConfig.projectDir, '/lib/seajs/manifest.js'), path.join(userConfig.projectDir, '/lib/seajs/seajs-localcache.js')],
 				scriptApp: [path.join(userConfig.projectDir, '/js/*.{' + types.script + '}')],
-				scriptLib: [path.join(userConfig.projectDir, '/lib/*.{' + types.script + '}'), '!**/seajs'],
+				scriptLib: [path.join(userConfig.projectDir, '/lib/**'), '!' + path.join(userConfig.projectDir, '/lib/seajs/**')],
 				image: [path.join(userConfig.projectDir, '/img/**/*.{' + types.img + '}')],
 				imageALL: [path.join(userConfig.projectDir, '/**/*.{' + types.img + '}'), '!' + path.join(userConfig.projectDir, '/img/**/*.{' + types.img + '}')],
 				cssMain: [path.join(userConfig.projectDir, '/css/style.less')],
