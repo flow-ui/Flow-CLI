@@ -21,8 +21,8 @@ seajs.set = {
 seajs.config({
 	base: seajs.root + "/modules",
 	paths: {
-		"js" : "/doc/js",
-		"lib": "/doc/lib"
+		"js" : "/front-flow-cli/js",
+		"lib": "/front-flow-cli/lib"
 	},
 	alias: {
 		"audio"		     : "audio/audio",
