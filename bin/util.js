@@ -39,6 +39,17 @@ const insertBeforeStr = function(fileContents, search, str) {
 		return fileContents;
 	}
 };
+const insertAfterStr = function(fileContents, search, str) {
+	let index, start, end;
+	index = fileContents.indexOf(search);
+	if (index > -1) {
+		start = fileContents.substr(0, index + search.length);
+		end = fileContents.substr(index + search.length);
+		return start + str + end;
+	} else {
+		return fileContents;
+	}
+};
 const readFileSync = function(filepath) {
 	return fs.readFileSync(filepath).toString().trim();
 };
@@ -47,6 +58,7 @@ module.exports = {
 	isExist: isExist,
 	isContain: isContain,
 	insertBeforeStr: insertBeforeStr,
+	insertAfterStr: insertAfterStr,
 	getUUID: getUUID,
 	readFileSync: readFileSync
 };

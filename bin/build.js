@@ -83,9 +83,17 @@ let getWidget = function(widgetName, type, page, isPath) {
 const isIncludeReg = /include\\([^\\]+)\\|include\\([^\\\.]+\..+)/;
 
 const scriptLib = function(filePath, callback) {
+	if(!globalConfig.compress){
+		gulp.src(path.join(globalConfig.projectDir, '/seajs.config.js'))
+			.pipe(replace(globalConfig.rootHolder, globalConfig.serverRoot))
+			.pipe(replace(globalConfig.distHolder, distHolderFinal))
+			.pipe(gulp.dest(globalConfig.distDir));
+	}
 	gulp.src(globalConfig.paths.scriptLib)
 		.pipe(plumber())
 		.pipe(changed(globalConfig.dist.lib))
+		.pipe(replace(globalConfig.rootHolder, globalConfig.serverRoot))
+		.pipe(replace(globalConfig.distHolder, distHolderFinal))
 		.pipe(globalConfig.compress ? uglify() : gutil.noop())
 		.pipe(gulp.dest(globalConfig.dist.lib));
 
@@ -396,6 +404,10 @@ seajs.use("${x}-script-inline");
 			if (scriptWrap !== '<script>') {
 				scriptWrap += '</script>';
 				content += scriptWrap;
+			}
+			//开发模式添加seajs.config文件
+			if(!globalConfig.compress){
+				content = util.insertAfterStr(content, 'id="seajsnode"></script>', '\n<script src="/'+distHolderFinal+'/seajs.config.js"></script>');
 			}
 			file.contents = Buffer.from(content);
 			return file;
