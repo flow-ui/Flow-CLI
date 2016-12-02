@@ -1,5 +1,9 @@
-const util = require('./util');
 const path = require('path');
+const fs = require('fs');
+
+const repl = require('repl');
+const ora = require('ora');
+const npmview = require('npmview');
 const gulp = require('gulp');
 const gutil = require('gulp-util');
 const plumber = require('gulp-plumber');
@@ -12,14 +16,13 @@ const sourcemaps = require('gulp-sourcemaps');
 const concat = require('gulp-concat');
 const changed = require('gulp-changed');
 const uglify = require('gulp-uglify');
-const globalConfig = require('./paths')();
-const ora = require('ora');
 const tap = require('gulp-tap');
-const pkg = require('../package.json');
-const npmview = require('npmview');
-const repl = require('repl');
-let spinner = ora();
 
+const util = require('./util');
+const globalConfig = require('./paths')();
+const pkg = require('../package.json');
+
+let spinner = ora();
 const distHolderFinal = globalConfig.serverRoot ? (globalConfig.serverRoot + '/' + globalConfig.distDir) : globalConfig.distDir;
 
 //全局组件缓存
@@ -79,47 +82,169 @@ let getWidget = function(widgetName, type, page, isPath) {
 	}
 	return result;
 };
+//全局打包缓存
+let packages = {};
 
 const isIncludeReg = /include\\([^\\]+)\\|include\\([^\\\.]+\..+)/;
-
-const scriptLib = function(filePath, callback) {
-	if(!globalConfig.compress){
-		gulp.src(path.join(globalConfig.projectDir, '/seajs.config.js'))
-			.pipe(replace(globalConfig.rootHolder, globalConfig.serverRoot))
-			.pipe(replace(globalConfig.distHolder, distHolderFinal))
-			.pipe(gulp.dest(globalConfig.distDir));
+//脚本合并
+const scriptsConcat = function(option) {
+	// {
+	// 	src:
+	// 	name:
+	// 	dest:
+	// 	mapsrc:
+	// 	beforeConcat:
+	// 	callback
+	// }
+	if (!option || !option.src || !option.name || !option.name.split || !option.dest || !option.dest.split) {
+		return console.log('scriptsConcat()参数错误！');
 	}
-	gulp.src(globalConfig.paths.scriptLib)
+	if (!option.mapsrc) {
+		option.mapsrc = './';
+	}
+	gulp.src(option.src)
 		.pipe(plumber())
-		.pipe(changed(globalConfig.dist.lib))
 		.pipe(replace(globalConfig.rootHolder, globalConfig.serverRoot))
 		.pipe(replace(globalConfig.distHolder, distHolderFinal))
-		.pipe(globalConfig.compress ? uglify() : gutil.noop())
-		.pipe(gulp.dest(globalConfig.dist.lib));
-
-	gulp.src(globalConfig.paths.scriptConcat)
-		.pipe(concat('sea.js'))
-		.pipe(replace(globalConfig.rootHolder, globalConfig.serverRoot))
-		.pipe(replace(globalConfig.distHolder, distHolderFinal))
-		.pipe(globalConfig.compress ? uglify() : gutil.noop())
-		.pipe(gulp.dest(globalConfig.dist.lib))
-		.on('end', function() {
-			if (typeof(callback) === 'function') {
-				callback();
+		.pipe(tap(function(file) {
+			if(file.contents){
+				let content = file.contents.toString();
+				let result;
+				if (typeof(option.beforeConcat) === 'function') {
+					result = option.beforeConcat(file);
+				}
+				if (result && result.split) {
+					content = result;
+				}
+				file.contents = Buffer.from(content);
 			}
+			return file;
+		}))
+		.pipe(concat(option.name))
+		.pipe(globalConfig.compress ? sourcemaps.init() : gutil.noop())
+		.pipe(globalConfig.compress ? uglify() : gutil.noop())
+		.pipe(globalConfig.compress ? sourcemaps.write(option.mapsrc) : gutil.noop())
+		.pipe(gulp.dest(option.dest))
+		.on('end', function() {
+			if (typeof(option.callback) === 'function') {
+				option.callback();
+			}
+		})
+		.on('error',function(){
+			console.log('scriptsConcat()内部错误！');
+		});
+};
+const scriptsNormalOut = function(option) {
+	// {
+	// 	src:
+	// 	dest:
+	// 	mapsrc:
+	//  compress:
+	// 	callback
+	// }
+	if (!option || !option.src || !option.dest.split) {
+		return console.log('scriptsNormalOut()参数错误！');
+	}
+	if (!option.mapsrc) {
+		option.mapsrc = './';
+	}
+	gulp.src(option.src)
+		.pipe(plumber())
+		.pipe(changed(option.dest))
+		.pipe(option.compress && globalConfig.compress ? sourcemaps.init() : gutil.noop())
+		.pipe(replace(globalConfig.rootHolder, globalConfig.serverRoot))
+		.pipe(replace(globalConfig.distHolder, distHolderFinal))
+		.pipe(option.compress && globalConfig.compress ? uglify() : gutil.noop())
+		.pipe(option.compress && globalConfig.compress ? sourcemaps.write(option.mapsrc) : gutil.noop())
+		.pipe(gulp.dest(option.dest))
+		.on('end', function() {
+			if (typeof(option.callback) === 'function') {
+				option.callback();
+			}
+		})
+		.on('error',function(){
+			console.log('scriptsNormalOut()内部错误！');
+		});
+};
+const cssNormalOut = function(option) {
+	// {
+	// 	src:
+	// 	dest:
+	// 	mapsrc:
+	//  before:
+	//  compress:
+	// 	callback
+	// }
+	if (!option || !option.src || !option.dest.split) {
+		return console.log('cssNormalOut()参数错误！');
+	}
+	if (!option.mapsrc) {
+		option.mapsrc = './';
+	}
+	gulp.src(option.src)
+		.pipe(plumber())
+		.pipe(tap(function(file) {
+			let content = file.contents.toString();
+			let result;
+			if (typeof(option.before) === 'function') {
+				result = option.before(file);
+			}
+			if (result && result.split) {
+				content = result;
+			}
+			file.contents = Buffer.from(content);
+			return file;
+		}))
+		.pipe(replace(globalConfig.projectHolder, globalConfig.projectDir))
+		.pipe(replace(globalConfig.distHolder, distHolderFinal))
+		.pipe(globalConfig.compress ? sourcemaps.init() : gutil.noop())
+		.pipe(less({
+			plugins: [autoprefix],
+			compress: globalConfig.compress
+		}))
+		.pipe(globalConfig.compress ? sourcemaps.write(option.mapsrc) : gutil.noop())
+		.pipe(gulp.dest(option.dest))
+		.on('end', function() {
+			if (typeof(option.callback) === 'function') {
+				option.callback();
+			}
+		})
+		.on('error',function(){
+			console.log('cssNormalOut()内部错误！');
 		});
 };
 
-const scriptApp = function(filePath, callback) {
-	gulp.src(globalConfig.paths.scriptApp)
-		.pipe(changed(globalConfig.dist.js))
-		.pipe(replace(globalConfig.distHolder, distHolderFinal))
-		.pipe(gulp.dest(globalConfig.dist.js))
-		.on('end', function() {
-			if (typeof(callback) === 'function') {
-				callback();
-			}
+const scriptLib = function(filePath, callback) {
+	if (!globalConfig.compress) {
+		scriptsNormalOut({
+			src: path.join(globalConfig.projectDir, '/seajs.config.js'),
+			dest: globalConfig.distDir
 		});
+	}
+
+	scriptsNormalOut({
+		src: globalConfig.paths.scriptLib,
+		dest: globalConfig.dist.lib
+	});
+
+	scriptsConcat({
+		src: globalConfig.paths.scriptConcat,
+		name: 'sea.js',
+		dest: globalConfig.dist.lib,
+		mapsrc: './seajs',
+		callback: callback
+	});
+
+};
+
+const scriptApp = function(filePath, callback) {
+	scriptsNormalOut({
+		src: globalConfig.paths.scriptApp,
+		dest: globalConfig.dist.js,
+		mapsrc: './maps',
+		compress: false,
+		callback: callback
+	});
 };
 
 let script = function(filePath, callback) {
@@ -137,6 +262,7 @@ let script = function(filePath, callback) {
 				}
 			}
 		};
+
 	if (filePath && filePath.split) {
 		var widgetMatch = filePath.match(isIncludeReg);
 		if (widgetMatch) {
@@ -151,7 +277,6 @@ let script = function(filePath, callback) {
 				' 更新对应模块');
 		}
 	}
-
 	script.prototype.todoList.forEach(function(item, index) {
 		item(filePath, resolve);
 	});
@@ -198,23 +323,26 @@ let css = function(filePath, callback) {
 		}
 	}
 	if (filePath && filePath.split) {
-		var widgetMatch = filePath.match(isIncludeReg);
+		let widgetMatch = filePath.match(isIncludeReg);
+		globalConfig.paths.cssMain.forEach(function(e) {
+			if (filePath.indexOf(path.normalize(e)) > -1) {
+				mainTarget = true;
+			}
+		});
 		if (Array.isArray(widgetMatch)) {
+			//include/
 			if (widgets[widgetMatch[1]]) {
 				getWidget(widgetMatch[1], 'style', true);
-				mainTarget = globalConfig.paths.cssMain;
+				mainTarget = true;
 				//更新css缓存
 				needRefresh = true;
 			}
-		} else if (filePath.indexOf(path.normalize(path.join(globalConfig.projectDir, '/css/'))) > -1 || filePath.indexOf(path.normalize('_component/')) > -1) {
-			//匹配 css
-			mainTarget = globalConfig.paths.cssMain;
 		} else {
 			//其他
 			otherTarget = filePath;
 		}
 	} else {
-		mainTarget = globalConfig.paths.cssMain;
+		mainTarget = true;
 		otherTarget = globalConfig.paths.cssOther;
 	}
 	if (otherTarget) {
@@ -226,20 +354,16 @@ let css = function(filePath, callback) {
 				destTarget = path.join(destTarget, '/' + destmatch[1]);
 			}
 		}
-		gulp.src(otherTarget)
-			.pipe(plumber())
-			.pipe(replace(globalConfig.projectHolder, globalConfig.projectDir))
-			.pipe(less({
-				plugins: [autoprefix],
-				compress: globalConfig.compress
-			}))
-			.pipe(replace(globalConfig.distHolder, distHolderFinal))
-			.pipe(gulp.dest(destTarget));
+		cssNormalOut({
+			src: otherTarget,
+			dest: destTarget
+		});
 	}
 	if (mainTarget) {
-		gulp.src(mainTarget)
-			.pipe(plumber())
-			.pipe(tap(function(file) {
+		cssNormalOut({
+			src: globalConfig.paths.cssMainTarget,
+			dest: globalConfig.dist.css,
+			before: function(file) {
 				let content = file.contents.toString();
 				let importHTML = '';
 				if (importList.length) {
@@ -251,23 +375,10 @@ let css = function(filePath, callback) {
 				if (needRefresh) {
 					content += ('\n/* refresh:' + new Date() + ' */');
 				}
-				file.contents = Buffer.from(content);
-				return file;
-			}))
-			.pipe(globalConfig.compress ? sourcemaps.init() : gutil.noop())
-			.pipe(replace(globalConfig.projectHolder, globalConfig.projectDir))
-			.pipe(less({
-				plugins: [autoprefix],
-				compress: globalConfig.compress
-			}))
-			.pipe(replace(globalConfig.distHolder, distHolderFinal))
-			.pipe(globalConfig.compress ? sourcemaps.write('./maps') : gutil.noop())
-			.pipe(gulp.dest(globalConfig.dist.css))
-			.on('end', function() {
-				if (typeof(callback) === 'function') {
-					callback();
-				}
-			});
+				return content;
+			},
+			callback: callback
+		});
 	}
 };
 
@@ -301,7 +412,7 @@ let html = function(filePath, callback) {
 		gulp.src(path.join(globalConfig.projectDir, './*.ico'))
 			.pipe(gulp.dest(globalConfig.dist.html));
 	}
-	if(!compileTarget){
+	if (!compileTarget) {
 		//新增include模板
 		return null;
 	}
@@ -319,10 +430,10 @@ let html = function(filePath, callback) {
 					result = pageWidget[name][type];
 				} else {
 					result = getWidget(name, type, file.path, isPath);
-					if(type==='script' && uuid && uuid.split){
-						pageWidget[name+uuid] = {};
-						pageWidget[name+uuid][type] = result.replace(globalConfig.UUIDHolder, uuid);
-					}else if (pageWidget[name]) {
+					if (type === 'script' && uuid && uuid.split) {
+						pageWidget[name + uuid] = {};
+						pageWidget[name + uuid][type] = result.replace(globalConfig.UUIDHolder, uuid);
+					} else if (pageWidget[name]) {
 						pageWidget[name][type] = result;
 					} else {
 						pageWidget[name] = {};
@@ -346,17 +457,17 @@ let html = function(filePath, callback) {
 						let uuid;
 						let widgetHTML = getPageWidget(includeName, 'temp');
 						//使用_.template编译模板
-						if(widgetData && widgetData.trim()){
+						if (widgetData && widgetData.trim()) {
 							let _tempdata = JSON.parse(widgetData);
-							_tempdata.file = file;	//不知道为什么gulp-util要求_.template数据必须含有file对象
-							try{
+							_tempdata.file = file; //不知道为什么gulp-util要求_.template数据必须含有file对象
+							try {
 								widgetHTML = gutil.template(widgetHTML, _tempdata);
-							}catch(e){
-								console.log('\n> 组件['+gutil.colors.red(includeName)+']编译出错，请检查模板数据，详情参考_.template文档');
+							} catch (e) {
+								console.log('\n> 组件[' + gutil.colors.red(includeName) + ']编译出错，请检查模板数据，详情参考_.template文档');
 							}
 						}
 						content = content.replace(matchStr, widgetHTML);
-						if(widgetHTML && widgetHTML.indexOf(globalConfig.UUIDHolder)>-1){
+						if (widgetHTML && widgetHTML.indexOf(globalConfig.UUIDHolder) > -1) {
 							widgetUUID = util.getUUID();
 							content = content.replace(globalConfig.UUIDHolder, widgetUUID);
 						}
@@ -379,7 +490,7 @@ let html = function(filePath, callback) {
 						widgets[x].alise.forEach(function(page, i) {
 							if (page === file.path) {
 								_.splice(i, 1);
-								console.log('清理'+x);
+								console.log('清理' + x);
 								return null;
 							}
 						});
@@ -387,28 +498,70 @@ let html = function(filePath, callback) {
 					}
 				}
 			}
-			//内联script
-			let scriptWrap = '<script>';
+			//开发模式添加seajs.config文件
+			if (!globalConfig.compress) {
+				content = util.insertAfterStr(content, 'id="seajsnode"></script>', '\n<script src="/' + distHolderFinal + '/seajs.config.js"></script>');
+			}
+			//组件script合并
+			let pageWidgetNames = [];
+			let pageWidgetArray = [];
 			for (let x in pageWidget) {
 				if (pageWidget.hasOwnProperty(x)) {
 					if (pageWidget[x].script) {
-						scriptWrap += `
-define("${x}-script-inline",function(require) {
-	${pageWidget[x].script}
-});
-seajs.use("${x}-script-inline");
-`;
+						pageWidgetNames.push(x);
+						pageWidgetArray.push(path.join(globalConfig.paths.include, x, 'script.js'));
 					}
 				}
 			}
-			if (scriptWrap !== '<script>') {
-				scriptWrap += '</script>';
-				content += scriptWrap;
+			if (pageWidgetNames.length) {
+				//查找缓存
+				let hasCache = false;;
+				if (packages['script' + pageWidgetNames.length]) {
+					let maybeArr = packages['script' + pageWidgetNames.length];
+					maybeArr.forEach(function(maybe, i) {
+						let same = true;
+						pageWidgetNames.forEach(function(widget) {
+							if (!util.isContain(maybe, widget)) {
+								same = false;
+								return false;
+							}
+						});
+						if (same) {
+							hasCache = maybe;
+						}
+					});
+					if (hasCache) {
+						//此包已存在
+					} else {
+						packages['script' + pageWidgetNames.length].push(pageWidgetNames);
+					}
+				} else {
+					packages['script' + pageWidgetNames.length] = [pageWidgetNames];
+				}
+
+				let pageWidgetName = pageWidgetNames.join('-') + '.js';
+				let pageWidgetDest = path.join(globalConfig.serverRoot, globalConfig.distDir, './include');
+				if (!hasCache) {
+					scriptsConcat({
+						src: pageWidgetArray,
+						name: pageWidgetName,
+						dest: pageWidgetDest,
+						beforeConcat: function(file) {
+							let content = file.contents.toString();
+							let widgetName = file.path.match(isIncludeReg)[1];
+							content =
+								`define("${widgetName}-inline",function(require, exports, module) {
+		${content}
+	});
+	seajs.use("${widgetName}-inline");
+	`;
+							return content;
+						}
+					});
+				}
+				content = util.insertBeforeStr(content, '</body>', '<script src="' + path.join('/', path.join(pageWidgetDest, pageWidgetName)) + '"></script>\n');
 			}
-			//开发模式添加seajs.config文件
-			if(!globalConfig.compress){
-				content = util.insertAfterStr(content, 'id="seajsnode"></script>', '\n<script src="/'+distHolderFinal+'/seajs.config.js"></script>');
-			}
+
 			file.contents = Buffer.from(content);
 			return file;
 		}))
@@ -419,6 +572,7 @@ seajs.use("${x}-script-inline");
 				//初次编译，调起css
 				css();
 			}
+
 			if (typeof(callback) === 'function') {
 				callback();
 			}

@@ -48,7 +48,7 @@
   },
   "logs": [{
     "version": "3.2.4",
-    "description": "compress=false将保留配置文件原格式输出"
+    "description": "compress=false将保留配置文件原格式输出；组件js将合并为外链单文件"
   }, {
     "version": "3.2.3",
     "description": "增加compress配置"

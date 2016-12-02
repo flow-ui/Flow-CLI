@@ -25,20 +25,21 @@ const getPath = function() {
 			scriptLib: [path.join(userConfig.projectDir, '/lib/**'), '!' + path.join(userConfig.projectDir, '/lib/seajs/**')],
 			image: [path.join(userConfig.projectDir, '/img/**/*.{' + types.img + '}')],
 			imageALL: [path.join(userConfig.projectDir, '/**/*.{' + types.img + '}'), '!' + path.join(userConfig.projectDir, '/img/**/*.{' + types.img + '}')],
-			cssMain: [path.join(userConfig.projectDir, '/css/style.less')],
-			cssOther: [path.join(userConfig.projectDir, '/**/*.{' + types.css + '}'), '!' + path.join(userConfig.projectDir, '/include/**'), '!' + path.join(userConfig.projectDir, '/css/**')],
+			cssMain: ['/css/style.less', '/css/resp-smal.less', '/css/resp-midd.less', '/css/config.less', '/css/responsive.less', '_component/'],
+			cssMainTarget: path.join(globalConfig.projectDir, '/css/style.less'),
+			cssOther: [path.join(userConfig.projectDir, '/**/*.{' + types.css + '}'), '!' + path.join(userConfig.projectDir, '/include/**'), '!' + path.join(userConfig.projectDir, '/css/style.less'), '!' + path.join(userConfig.projectDir, '/css/resp-smal.less'), '!' + path.join(userConfig.projectDir, '/css/resp-midd.less'), '!' + path.join(userConfig.projectDir, '/css/config.less'), '!' + path.join(userConfig.projectDir, '/css/responsive.less')],
 			font: [path.join(userConfig.projectDir, '/font/*.{' + types.font + '}')],
 			html: path.join(userConfig.projectDir, '/*.{' + types.html + '}'),
 			htmlAll: path.join(userConfig.projectDir, '**/*.{' + types.html + '}'),
 			include: path.join(userConfig.projectDir, '/include')
 		};
 		globalConfig.dist = {
-			lib: path.join(userConfig.distDir, './lib'),
-			js: path.join(userConfig.distDir, './js'),
-			css: path.join(userConfig.distDir, './css'),
-			font: path.join(userConfig.distDir, './font'),
-			img: path.join(userConfig.distDir, './img'),
-			html: path.join(userConfig.distDir)
+			lib: path.join(userConfig.serverRoot, userConfig.distDir, './lib'),
+			js: path.join(userConfig.serverRoot, userConfig.distDir, './js'),
+			css: path.join(userConfig.serverRoot, userConfig.distDir, './css'),
+			font: path.join(userConfig.serverRoot, userConfig.distDir, './font'),
+			img: path.join(userConfig.serverRoot, userConfig.distDir, './img'),
+			html: path.join(userConfig.serverRoot, userConfig.distDir)
 		};
 		return globalConfig;
 	} else {
