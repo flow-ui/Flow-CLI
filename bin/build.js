@@ -107,7 +107,7 @@ const scriptsConcat = function(option) {
 		.pipe(replace(globalConfig.rootHolder, globalConfig.serverRoot))
 		.pipe(replace(globalConfig.distHolder, distHolderFinal))
 		.pipe(tap(function(file) {
-			if(file.contents){
+			if (file.contents) {
 				let content = file.contents.toString();
 				let result;
 				if (typeof(option.beforeConcat) === 'function') {
@@ -130,7 +130,7 @@ const scriptsConcat = function(option) {
 				option.callback();
 			}
 		})
-		.on('error',function(){
+		.on('error', function() {
 			console.log('scriptsConcat()内部错误！');
 		});
 };
@@ -162,7 +162,7 @@ const scriptsNormalOut = function(option) {
 				option.callback();
 			}
 		})
-		.on('error',function(){
+		.on('error', function() {
 			console.log('scriptsNormalOut()内部错误！');
 		});
 };
@@ -209,7 +209,7 @@ const cssNormalOut = function(option) {
 				option.callback();
 			}
 		})
-		.on('error',function(){
+		.on('error', function() {
 			console.log('cssNormalOut()内部错误！');
 		});
 };
@@ -514,54 +514,68 @@ let html = function(filePath, callback) {
 				}
 			}
 			if (pageWidgetNames.length) {
-				//查找缓存
-				let hasCache = false;;
-				if (packages['script' + pageWidgetNames.length]) {
-					let maybeArr = packages['script' + pageWidgetNames.length];
-					maybeArr.forEach(function(maybe, i) {
-						let same = true;
-						pageWidgetNames.forEach(function(widget) {
-							if (!util.isContain(maybe, widget)) {
-								same = false;
-								return false;
-							}
-						});
-						if (same) {
-							hasCache = maybe;
-						}
-					});
-					if (hasCache) {
-						//此包已存在
-					} else {
-						packages['script' + pageWidgetNames.length].push(pageWidgetNames);
-					}
-				} else {
-					packages['script' + pageWidgetNames.length] = [pageWidgetNames];
-				}
-
-				let pageWidgetName = pageWidgetNames.join('-') + '.js';
-				let pageWidgetDest = path.join(globalConfig.serverRoot, globalConfig.distDir, './include');
-				if (!hasCache) {
-					scriptsConcat({
-						src: pageWidgetArray,
-						name: pageWidgetName,
-						dest: pageWidgetDest,
-						beforeConcat: function(file) {
-							let content = file.contents.toString();
-							let widgetName = file.path.match(isIncludeReg)[1];
-							content =
-								`define("${widgetName}-inline",function(require, exports, module) {
-		${content}
+				let pageWidgetInsert;
+				if (pageWidgetNames.length === 1) {
+					let widgetName = pageWidgetNames[0];
+					pageWidgetInsert = pageWidget[widgetName].script;
+					if (pageWidgetInsert) {
+						pageWidgetInsert = `<script>
+	define("${widgetName}-inline", function(require, exports, module) {
+		${pageWidgetInsert}
 	});
 	seajs.use("${widgetName}-inline");
-	`;
-							return content;
+	</script>`;
+					}
+				} else {
+					//查找缓存
+					let hasCache = false;;
+					if (packages['script' + pageWidgetNames.length]) {
+						let maybeArr = packages['script' + pageWidgetNames.length];
+						maybeArr.forEach(function(maybe, i) {
+							let same = true;
+							pageWidgetNames.forEach(function(widget) {
+								if (!util.isContain(maybe, widget)) {
+									same = false;
+									return false;
+								}
+							});
+							if (same) {
+								hasCache = maybe;
+							}
+						});
+						if (hasCache) {
+							//此包已存在
+						} else {
+							packages['script' + pageWidgetNames.length].push(pageWidgetNames);
 						}
-					});
-				}
-				content = util.insertBeforeStr(content, '</body>', '<script src="' + path.join('/', path.join(pageWidgetDest, pageWidgetName)) + '"></script>\n');
-			}
+					} else {
+						packages['script' + pageWidgetNames.length] = [pageWidgetNames];
+					}
 
+					let pageWidgetName = pageWidgetNames.join('-') + '.js';
+					let pageWidgetDest = path.join(globalConfig.serverRoot, globalConfig.distDir, './include');
+					pageWidgetInsert = '<script src="' + path.join('/', path.join(pageWidgetDest, pageWidgetName)) + '"></script>\n';
+					if (!hasCache) {
+						scriptsConcat({
+							src: pageWidgetArray,
+							name: pageWidgetName,
+							dest: pageWidgetDest,
+							beforeConcat: function(file) {
+								let content = file.contents.toString();
+								let widgetName = file.path.match(isIncludeReg)[1];
+								content =
+									`define("${widgetName}-inline",function(require, exports, module) {
+			${content}
+		});
+		seajs.use("${widgetName}-inline");
+		`;
+								return content;
+							}
+						});
+					}
+				}
+				content = util.insertBeforeStr(content, '</body>', pageWidgetInsert);
+			}
 			file.contents = Buffer.from(content);
 			return file;
 		}))

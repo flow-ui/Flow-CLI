@@ -34,12 +34,12 @@ const getPath = function() {
 			include: path.join(userConfig.projectDir, '/include')
 		};
 		globalConfig.dist = {
-			lib: path.join(userConfig.serverRoot, userConfig.distDir, './lib'),
-			js: path.join(userConfig.serverRoot, userConfig.distDir, './js'),
-			css: path.join(userConfig.serverRoot, userConfig.distDir, './css'),
-			font: path.join(userConfig.serverRoot, userConfig.distDir, './font'),
-			img: path.join(userConfig.serverRoot, userConfig.distDir, './img'),
-			html: path.join(userConfig.serverRoot, userConfig.distDir)
+			lib: path.join(userConfig.distDir, './lib'),
+			js: path.join(userConfig.distDir, './js'),
+			css: path.join(userConfig.distDir, './css'),
+			font: path.join(userConfig.distDir, './font'),
+			img: path.join(userConfig.distDir, './img'),
+			html: path.join(userConfig.distDir)
 		};
 		return globalConfig;
 	} else {
