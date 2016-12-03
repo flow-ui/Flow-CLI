@@ -100,7 +100,7 @@ const scriptsConcat = function(option) {
 		return console.log('scriptsConcat()参数错误！');
 	}
 	if (!option.mapsrc) {
-		option.mapsrc = './maps';
+		option.mapsrc = './';
 	}
 	gulp.src(option.src)
 		.pipe(plumber())
@@ -121,6 +121,7 @@ const scriptsConcat = function(option) {
 		.pipe(globalConfig.compress ? sourcemaps.init() : gutil.noop())
 		.pipe(concat(option.name))
 		.pipe(replace(globalConfig.rootHolder, globalConfig.serverRoot))
+		.pipe(replace(globalConfig.projectHolder, globalConfig.projectDir))
 		.pipe(replace(globalConfig.distHolder, distHolderFinal))
 		.pipe(globalConfig.compress ? uglify() : gutil.noop())
 		.pipe(globalConfig.compress ? sourcemaps.write(option.mapsrc) : gutil.noop())
@@ -146,13 +147,14 @@ const scriptsNormalOut = function(option) {
 		return console.log('scriptsNormalOut()参数错误！');
 	}
 	if (!option.mapsrc) {
-		option.mapsrc = './maps';
+		option.mapsrc = './';
 	}
 	gulp.src(option.src)
 		.pipe(plumber())
 		.pipe(changed(option.dest))
 		.pipe(option.compress && globalConfig.compress ? sourcemaps.init() : gutil.noop())
 		.pipe(replace(globalConfig.rootHolder, globalConfig.serverRoot))
+		.pipe(replace(globalConfig.projectHolder, globalConfig.projectDir))
 		.pipe(replace(globalConfig.distHolder, distHolderFinal))
 		.pipe(option.compress && globalConfig.compress ? uglify() : gutil.noop())
 		.pipe(option.compress && globalConfig.compress ? sourcemaps.write(option.mapsrc) : gutil.noop())
@@ -179,7 +181,7 @@ const cssNormalOut = function(option) {
 		return console.log('cssNormalOut()参数错误！');
 	}
 	if (!option.mapsrc) {
-		option.mapsrc = './maps';
+		option.mapsrc = './';
 	}
 	gulp.src(option.src)
 		.pipe(plumber())
@@ -196,6 +198,7 @@ const cssNormalOut = function(option) {
 			return file;
 		}))
 		.pipe(globalConfig.compress ? sourcemaps.init() : gutil.noop())
+		.pipe(replace(globalConfig.rootHolder, globalConfig.serverRoot))
 		.pipe(replace(globalConfig.projectHolder, globalConfig.projectDir))
 		.pipe(less({
 			plugins: [autoprefix],
@@ -369,7 +372,8 @@ let css = function(filePath, callback) {
 		}
 		cssNormalOut({
 			src: otherTarget,
-			dest: destTarget
+			dest: destTarget,
+			mapsrc: './'
 		});
 	}
 	if (mainTarget) {
@@ -429,6 +433,7 @@ let html = function(filePath, callback) {
 		//新增include模板
 		return null;
 	}
+	let uuidCollection = {};
 	gulp.src(compileTarget)
 		.pipe(tap(function(file) {
 			let content = file.contents.toString();
@@ -443,9 +448,11 @@ let html = function(filePath, callback) {
 					result = pageWidget[name][type];
 				} else {
 					result = getWidget(name, type, file.path, isPath);
-					if (type === 'script' && uuid && uuid.split) {
-						pageWidget[name + uuid] = {};
-						pageWidget[name + uuid][type] = result.replace(globalConfig.UUIDHolder, uuid);
+					if(uuid && uuid.split){
+						if(!uuidCollection[type]){
+							uuidCollection[type] = {};
+						}
+						uuidCollection[type][uuid] = result.replace(globalConfig.UUIDHolder, uuid);
 					} else if (pageWidget[name]) {
 						pageWidget[name][type] = result;
 					} else {
@@ -526,19 +533,33 @@ let html = function(filePath, callback) {
 					}
 				}
 			}
+			//带随机数脚本
+			let pageWidgetInsert = '<script>';
+			for(let x in uuidCollection.script){
+				if (uuidCollection.script.hasOwnProperty(x)) {
+					let cont = uuidCollection.script[x];
+					pageWidgetInsert += `
+define("${x}-inline", function(require, exports, module) {
+	${cont}
+});
+seajs.use("${x}-inline");
+`;
+				}
+			}
 			if (pageWidgetNames.length) {
-				let pageWidgetInsert;
 				if (pageWidgetNames.length === 1) {
+					//单文件内嵌
 					let widgetName = pageWidgetNames[0];
-					pageWidgetInsert = pageWidget[widgetName].script;
-					if (pageWidgetInsert) {
-						pageWidgetInsert = `<script>
+					let cont = pageWidget[widgetName].script;
+					if (cont) {
+						pageWidgetInsert += `
 	define("${widgetName}-inline", function(require, exports, module) {
-		${pageWidgetInsert}
+		${cont}
 	});
 	seajs.use("${widgetName}-inline");
-	</script>`;
+`;
 					}
+					pageWidgetInsert += '</script>';
 				} else {
 					//查找缓存
 					let hasCache = false;;
@@ -567,12 +588,13 @@ let html = function(filePath, callback) {
 
 					let pageWidgetName = pageWidgetNames.join('-') + '.js';
 					let pageWidgetDest = path.join(globalConfig.serverRoot, globalConfig.distDir, './include');
-					pageWidgetInsert = '<script src="' + path.join('/', path.join(pageWidgetDest, pageWidgetName)) + '"></script>\n';
+					pageWidgetInsert += '</script>\n<script src="' + path.join('/', path.join(pageWidgetDest, pageWidgetName)) + '"></script>\n';
 					if (!hasCache) {
 						scriptsConcat({
 							src: pageWidgetArray,
 							name: pageWidgetName,
 							dest: pageWidgetDest,
+							mapsrc: './maps',
 							beforeConcat: function(file) {
 								let content = file.contents.toString();
 								let widgetName = file.path.match(isIncludeReg)[1];
@@ -587,11 +609,15 @@ let html = function(filePath, callback) {
 						});
 					}
 				}
-				content = util.insertBeforeStr(content, '</body>', pageWidgetInsert);
+			}else{
+				pageWidgetInsert += '</script>';
 			}
+			content = util.insertBeforeStr(content, '</body>', pageWidgetInsert);
 			file.contents = Buffer.from(content);
 			return file;
 		}))
+		.pipe(replace(globalConfig.rootHolder, globalConfig.serverRoot))
+		.pipe(replace(globalConfig.projectHolder, globalConfig.projectDir))
 		.pipe(replace(globalConfig.distHolder, distHolderFinal))
 		.pipe(gulp.dest(globalConfig.dist.html))
 		.on('end', function() {
