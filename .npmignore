@@ -1,9 +1,10 @@
 /test
+/_src
+/_docs
 /docs
 /modules
 /LICENSE
 /.travis.yml
 /node_modules
-/_src
 /config.json
 /_component
