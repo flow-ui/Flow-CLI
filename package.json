@@ -1,6 +1,6 @@
 {
   "name": "front-flow-cli",
-  "version": "3.2.4",
+  "version": "3.2.5",
   "description": "为front-flow项目开发的命令行工具",
   "keywords": [
     "frontend",
@@ -47,6 +47,9 @@
     "node": ">= 6.5.0"
   },
   "logs": [{
+    "version": "3.2.5",
+    "description": "bug fix"
+  }, {
     "version": "3.2.4",
     "description": "compress=false将保留配置文件原格式输出；组件脚本合并为外链文件，只有一个组件脚本时代码内嵌到页面"
   }, {

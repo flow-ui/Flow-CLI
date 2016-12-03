@@ -100,12 +100,10 @@ const scriptsConcat = function(option) {
 		return console.log('scriptsConcat()参数错误！');
 	}
 	if (!option.mapsrc) {
-		option.mapsrc = './';
+		option.mapsrc = './maps';
 	}
 	gulp.src(option.src)
 		.pipe(plumber())
-		.pipe(replace(globalConfig.rootHolder, globalConfig.serverRoot))
-		.pipe(replace(globalConfig.distHolder, distHolderFinal))
 		.pipe(tap(function(file) {
 			if (file.contents) {
 				let content = file.contents.toString();
@@ -120,8 +118,10 @@ const scriptsConcat = function(option) {
 			}
 			return file;
 		}))
-		.pipe(concat(option.name))
 		.pipe(globalConfig.compress ? sourcemaps.init() : gutil.noop())
+		.pipe(concat(option.name))
+		.pipe(replace(globalConfig.rootHolder, globalConfig.serverRoot))
+		.pipe(replace(globalConfig.distHolder, distHolderFinal))
 		.pipe(globalConfig.compress ? uglify() : gutil.noop())
 		.pipe(globalConfig.compress ? sourcemaps.write(option.mapsrc) : gutil.noop())
 		.pipe(gulp.dest(option.dest))
@@ -146,7 +146,7 @@ const scriptsNormalOut = function(option) {
 		return console.log('scriptsNormalOut()参数错误！');
 	}
 	if (!option.mapsrc) {
-		option.mapsrc = './';
+		option.mapsrc = './maps';
 	}
 	gulp.src(option.src)
 		.pipe(plumber())
@@ -179,7 +179,7 @@ const cssNormalOut = function(option) {
 		return console.log('cssNormalOut()参数错误！');
 	}
 	if (!option.mapsrc) {
-		option.mapsrc = './';
+		option.mapsrc = './maps';
 	}
 	gulp.src(option.src)
 		.pipe(plumber())
@@ -195,13 +195,13 @@ const cssNormalOut = function(option) {
 			file.contents = Buffer.from(content);
 			return file;
 		}))
-		.pipe(replace(globalConfig.projectHolder, globalConfig.projectDir))
-		.pipe(replace(globalConfig.distHolder, distHolderFinal))
 		.pipe(globalConfig.compress ? sourcemaps.init() : gutil.noop())
+		.pipe(replace(globalConfig.projectHolder, globalConfig.projectDir))
 		.pipe(less({
 			plugins: [autoprefix],
 			compress: globalConfig.compress
 		}))
+		.pipe(replace(globalConfig.distHolder, distHolderFinal))
 		.pipe(globalConfig.compress ? sourcemaps.write(option.mapsrc) : gutil.noop())
 		.pipe(gulp.dest(option.dest))
 		.on('end', function() {
@@ -241,7 +241,6 @@ const scriptApp = function(filePath, callback) {
 	scriptsNormalOut({
 		src: globalConfig.paths.scriptApp,
 		dest: globalConfig.dist.js,
-		mapsrc: './maps',
 		compress: false,
 		callback: callback
 	});
