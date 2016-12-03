@@ -433,9 +433,11 @@ let html = function(filePath, callback) {
 		//新增include模板
 		return null;
 	}
-	let uuidCollection = {};
+	
 	gulp.src(compileTarget)
 		.pipe(tap(function(file) {
+			//uuid组件缓存
+			let uuidCollection = {};
 			let content = file.contents.toString();
 			let matches = content.match(/^(\s+)?(\/\/|\/\*|\#|\<\!\-\-)(\s+)?=(\s+)?(include|require)(.+$)/mg);
 			//页面级组件缓存
@@ -538,12 +540,14 @@ let html = function(filePath, callback) {
 			for(let x in uuidCollection.script){
 				if (uuidCollection.script.hasOwnProperty(x)) {
 					let cont = uuidCollection.script[x];
-					pageWidgetInsert += `
+					if(cont){
+						pageWidgetInsert += `
 define("${x}-inline", function(require, exports, module) {
 	${cont}
 });
 seajs.use("${x}-inline");
 `;
+					}
 				}
 			}
 			if (pageWidgetNames.length) {
@@ -559,7 +563,11 @@ seajs.use("${x}-inline");
 	seajs.use("${widgetName}-inline");
 `;
 					}
-					pageWidgetInsert += '</script>';
+					if(pageWidgetInsert === '<script>'){
+						pageWidgetInsert = '';
+					}else{
+						pageWidgetInsert += '</script>';
+					}
 				} else {
 					//查找缓存
 					let hasCache = false;;
@@ -588,7 +596,12 @@ seajs.use("${x}-inline");
 
 					let pageWidgetName = pageWidgetNames.join('-') + '.js';
 					let pageWidgetDest = path.join(globalConfig.serverRoot, globalConfig.distDir, './include');
-					pageWidgetInsert += '</script>\n<script src="' + path.join('/', path.join(pageWidgetDest, pageWidgetName)) + '"></script>\n';
+					if(pageWidgetInsert === '<script>'){
+						pageWidgetInsert = '';
+					}else{
+						pageWidgetInsert += '</script>';
+					}
+					pageWidgetInsert += '\n<script src="' + path.join('/', path.join(pageWidgetDest, pageWidgetName)) + '"></script>\n';
 					if (!hasCache) {
 						scriptsConcat({
 							src: pageWidgetArray,
@@ -610,7 +623,11 @@ seajs.use("${x}-inline");
 					}
 				}
 			}else{
-				pageWidgetInsert += '</script>';
+				if(pageWidgetInsert === '<script>'){
+					pageWidgetInsert = '';
+				}else{
+					pageWidgetInsert += '</script>';
+				}
 			}
 			content = util.insertBeforeStr(content, '</body>', pageWidgetInsert);
 			file.contents = Buffer.from(content);
