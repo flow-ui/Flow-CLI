@@ -23,8 +23,7 @@ const getPath = function() {
 			scriptConcat: [path.join(userConfig.projectDir, '/lib/seajs/sea.js'), globalConfig.compress ? path.join(userConfig.projectDir, '/seajs.config.js') : '', path.join(userConfig.projectDir, '/lib/seajs/manifest.js'), path.join(userConfig.projectDir, '/lib/seajs/seajs-localcache.js')],
 			scriptApp: [path.join(userConfig.projectDir, '/js/*.{' + types.script + '}')],
 			scriptLib: [path.join(userConfig.projectDir, '/lib/**'), '!' + path.join(userConfig.projectDir, '/lib/seajs/**')],
-			image: [path.join(userConfig.projectDir, '/img/**/*.{' + types.img + '}')],
-			imageALL: [path.join(userConfig.projectDir, '/**/*.{' + types.img + '}'), '!' + path.join(userConfig.projectDir, '/img/**/*.{' + types.img + '}')],
+			imageAll: [path.join(userConfig.projectDir, '/**/*.{' + types.img + '}')],
 			cssMain: ['/css/style.less', '/css/resp-smal.less', '/css/resp-midd.less', '/css/config.less', '/css/responsive.less', '_component/'],
 			cssMainTarget: path.join(globalConfig.projectDir, '/css/style.less'),
 			cssOther: [path.join(userConfig.projectDir, '/**/*.{' + types.css + '}'), '!' + path.join(userConfig.projectDir, '/include/**'), '!' + path.join(userConfig.projectDir, '/css/style.less'), '!' + path.join(userConfig.projectDir, '/css/resp-smal.less'), '!' + path.join(userConfig.projectDir, '/css/resp-midd.less'), '!' + path.join(userConfig.projectDir, '/css/config.less'), '!' + path.join(userConfig.projectDir, '/css/responsive.less')],
@@ -39,7 +38,7 @@ const getPath = function() {
 			css: path.join(userConfig.distDir, './css'),
 			font: path.join(userConfig.distDir, './font'),
 			img: path.join(userConfig.distDir, './img'),
-			html: path.join(userConfig.distDir)
+			html: path.join(userConfig.distDir, './')
 		};
 		return globalConfig;
 	} else {

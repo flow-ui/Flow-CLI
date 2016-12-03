@@ -175,7 +175,7 @@ const cssNormalOut = function(option) {
 	//  compress:
 	// 	callback
 	// }
-	if (!option || !option.src || !option.dest.split) {
+	if (!option || !option.src || !option.dest || !option.dest.split) {
 		return console.log('cssNormalOut()参数错误！');
 	}
 	if (!option.mapsrc) {
@@ -211,6 +211,26 @@ const cssNormalOut = function(option) {
 		})
 		.on('error', function() {
 			console.log('cssNormalOut()内部错误！');
+		});
+};
+
+const imageMin = function(option){
+	// {
+	// 	src:
+	// 	dest:
+	// 	callback
+	// }
+	if (!option || !option.src || !option.dest || !option.dest.split) {
+		return console.log('imageMin()参数错误！');
+	}
+	gulp.src(option.src)
+		.pipe(changed(option.dest))
+		.pipe(imagemin())
+		.pipe(gulp.dest(option.dest))
+		.on('end', function() {
+			if (typeof(option.callback) === 'function') {
+				option.callback();
+			}
 		});
 };
 
@@ -283,20 +303,14 @@ let script = function(filePath, callback) {
 script.prototype.todoList = [scriptLib, scriptApp];
 
 let image = function(filePath, callback) {
-	gulp.src(globalConfig.paths.imageALL)
-		.pipe(changed(globalConfig.distDir))
-		.pipe(imagemin())
-		.pipe(gulp.dest(globalConfig.distDir));
-
-	gulp.src(globalConfig.paths.image)
-		.pipe(changed(globalConfig.dist.img))
-		.pipe(imagemin())
-		.pipe(gulp.dest(globalConfig.dist.img))
-		.on('end', function() {
-			if (typeof(callback) === 'function') {
-				callback();
-			}
-		});
+	if(!filePath){
+		filePath = globalConfig.paths.imageAll;
+	}
+	imageMin({
+		src: filePath,
+		dest: globalConfig.distDir,
+		callback: callback
+	});
 };
 
 let font = function(file, callback) {
