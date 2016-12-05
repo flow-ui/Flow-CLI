@@ -48,7 +48,7 @@
   },
   "logs": [{
     "version": "3.2.6",
-    "description": "uuid bug fix"
+    "description": "uuid bug fix；增加编译细节输出"
   }, {
     "version": "3.2.5",
     "description": "bug fix"

@@ -284,7 +284,8 @@ let script = function(filePath, callback) {
 				}
 			}
 		};
-
+	spinner.text = '正在构建script';
+	spinner.render();
 	if (filePath && filePath.split) {
 		var widgetMatch = filePath.match(isIncludeReg);
 		if (widgetMatch) {
@@ -306,6 +307,8 @@ let script = function(filePath, callback) {
 script.prototype.todoList = [scriptLib, scriptApp];
 
 let image = function(filePath, callback) {
+	spinner.text = '正在构建image';
+	spinner.render();
 	if(!filePath){
 		filePath = globalConfig.paths.imageAll;
 	}
@@ -317,6 +320,8 @@ let image = function(filePath, callback) {
 };
 
 let font = function(file, callback) {
+	spinner.text = '正在构建font';
+	spinner.render();
 	gulp.src(globalConfig.paths.font)
 		.pipe(gulp.dest(globalConfig.dist.font))
 		.on('end', function() {
@@ -331,6 +336,8 @@ let css = function(filePath, callback) {
 	let needRefresh;
 	let mainTarget;
 	let otherTarget;
+	spinner.text = '正在构建css';
+	spinner.render();
 	for (let x in widgets) {
 		if (widgets.hasOwnProperty(x)) {
 			if (widgets[x].style) {
@@ -401,6 +408,8 @@ let css = function(filePath, callback) {
 
 let html = function(filePath, callback) {
 	let compileTarget;
+	spinner.text = '正在构建html';
+	spinner.render();
 	if (filePath) {
 		if (filePath.split) {
 			var widgetMatch = filePath.match(isIncludeReg);
@@ -662,6 +671,7 @@ let build = function(callback) {
 				todoList = null;
 				delete build.prototype.todoList;
 				diff = process.hrtime(start);
+				spinner.clear();
 				spinner.text = '构建完成, 耗时:' + (diff[0] * 1e3 + diff[1] / 1e6).toFixed(2) + 'ms';
 				spinner.succeed();
 				if (typeof(callback) === 'function') {
@@ -672,7 +682,6 @@ let build = function(callback) {
 			}
 		},
 		startBuild = function() {
-			spinner.text = '正在构建...';
 			spinner.start();
 			build.prototype.todoList.forEach(function(item, index) {
 				item(null, resolve);
@@ -683,8 +692,10 @@ let build = function(callback) {
 		return process.exit();
 	}
 	if (!globalConfig.checkUpdate) {
+		spinner.text = '正在构建...';
 		return startBuild();
 	}
+	spinner.text = '正在检查更新...';
 	npmview(pkg.name, function(err, version, moduleInfo) {
 		let newV = version.split('.'),
 			nowV = pkg.version.split('.'),
@@ -717,7 +728,7 @@ let build = function(callback) {
 		}
 	});
 };
-build.prototype.todoList = [script, image, font, html];
+build.prototype.todoList = [script, image, font, html]; //css编译将被html调起
 
 module.exports = {
 	build: build,
