@@ -32,9 +32,9 @@
 
 编译并监听开发目录，启动实时预览服务
 
-##配置
+##文档
 
-所有配置均位于`/config.json`
+https://tower1229.github.io/Flow-CLI/docs/
 
 ##License 
 
