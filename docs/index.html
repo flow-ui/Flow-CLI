@@ -9,16 +9,16 @@
     <title>front-flow-cli</title>
     <meta content="front-flow-cli,front-flow" name="Keywords">
     <meta content="front-flow-cli是专为front-flow前端工作流开发的命令行工具，实现自动初始化、组件化开发、预处理、静态资源优化、图片压缩等前端自动化需求。" name="Description">
-    <link href="/docs/favicon.ico" rel="icon">
-<link href="/docs/css/style.css" rel="stylesheet">
-<link href="/docs/lib/highlight/styles/github.css" rel="stylesheet">
-<link href="/docs/css/doc.css" rel="stylesheet">
+    <link href="/Flow-CLI/docs/favicon.ico" rel="icon">
+<link href="/Flow-CLI/docs/css/style.css" rel="stylesheet">
+<link href="/Flow-CLI/docs/lib/highlight/styles/github.css" rel="stylesheet">
+<link href="/Flow-CLI/docs/css/doc.css" rel="stylesheet">
 <script type="text/javascript">
 	if(window.location.href.indexOf('https')===0){
 		document.write('<meta http-equiv="Content-Security-Policy" content="upgrade-insecure-requests" />');
 	}
 </script>
-<!--[if lt IE 9]><script src="/docs/lib/H5shiv.js"></script><![endif]-->
+<!--[if lt IE 9]><script src="/Flow-CLI/docs/lib/H5shiv.js"></script><![endif]-->
 </head>
 
 <body class="hasNav">
@@ -51,11 +51,14 @@
         <p>2. npm全局安装：<code>npm install front-flow-cli -g</code></p>
         <p>3. 安装完成，查看版本号：<code>flow -V</code></p>
         <h3 id="command">命令</h3>
-        <p>1. <code>flow init</code>在当前目录初始化一个<a href="https://github.com/front-flow/front-flow-template" target="_blank">front-flow-template</a>项目</p>
-        <p>2. <code>flow build</code>编译当前项目</p>
-        <p>3. <code>flow run</code>编译当前项目并启动开发服务，实时编译并刷新浏览器</p>
+        <h4>flow init</h4>
+        <p>在当前目录初始化一个<a href="https://github.com/front-flow/front-flow-template" target="_blank">front-flow-template</a>项目</p>
+        <h4>flow build</h4>
+        <p>编译当前项目</p>
+        <h4>flow run</h4>
+        <p>编译当前项目并启动开发服务，实时编译并刷新浏览器</p>
         <h3 id="setup">配置</h3>
-        编译相关的所有配置均在<code>config.json</code>中设置：
+        编译相关的所有配置均在<code>config.json</code>中：
         <table class="table table-hover">
             <tr>
                 <td>projectDir</td>
@@ -96,25 +99,25 @@
             <tr>
                 <td>rootHolder</td>
                 <td>
-                    源码中引用站点部署路径的变量名
+                    源码中引用站点部署路径的占位符
                 </td>
             </tr>
             <tr>
                 <td>projectHolder</td>
                 <td>
-                    源码中引用项目源码目录的变量名
+                    源码中引用项目源码目录的占位符
                 </td>
             </tr>
             <tr>
                 <td>distHolder</td>
                 <td>
-                    源码中引用产出目录的变量名
+                    源码中引用产出目录的占位符
                 </td>
             </tr>
             <tr>
                 <td>UUIDHolder</td>
                 <td>
-                    源码中生成一个随机6位数字字母组合的变量名，仅用于组件中html和script成对使用
+                    组件<code>uuid</code>占位符，用于在组件中生成一个随机6位数字字母字符串
                 </td>
             </tr>
             <tr>
@@ -133,32 +136,63 @@
     </section>
     <section class="wrap" id="css">
         <h2>编译过程</h2>
-        <h3 id="compile-ui">UI</h3>
-        <p><code>_component/</code>用于存放UI组件，<code>_src/css/config.less</code>是less配置文件，<code>_src/css/responsive.less</code>、<code>_src/css/resp-midd.less</code>、<code>_src/css/resp-smal.less</code>是响应式样式文件，这些文件可以按需在<code>_src/css/style.less</code>中引用，最终编译到<code>style.css</code>中，不会单独输出到产出文件，他们的修改会触发<code>_src/css/style.less</code>的重新编译；</p>
-        <p>项目里的其他<code>css/less</code>文件将按原相对路径输出到产出文件夹。</p>
+        <p>编译按<code>script => image => font => html => css</code>顺序进行，各环节支持的格式如下，未包含的格式暂不被支持</p>
+        <pre>
+            <code>
+const types = {
+    script: 'js,coffee',
+    css: 'css,less',
+    img: 'JPG,jpg,png,gif',
+    html: 'htm,html',
+    font: 'eot,svg,ttf,woff'
+};
+            </code>
+        </pre>
         
         <h3 id="compile-script">脚本</h3>
-        <p>...</p>
-        <h3 id="compile-template">模板</h3>
         <p>js编译包含两大部分，一是非模块化js及不需要处理的业务js直接发布，二是seajs相关文件会合并为一个sea.js文件并发布</p>
+        <p>脚本编译经过以下流程：</p>
+        <ol>
+            <li>模块化相关文件合并压缩输出到编译目录<code>/lib/seajs.js</code>，包括：<code>'_src/lib/seajs/sea.js'</code>、<code>'_src/seajs.config.js'</code>、<code>'_src/lib/seajs/manifest.js'</code>、<code>'_src/lib/seajs/seajs-localcache.js'</code>
+                <p>注：不压缩的情况<code>'/seajs.config.js'</code>不参与合并，而是独立输出并自动在页面底部引用，便于开发中修改</p>
+            </li>
+            <li><code>_src/lib/</code>下的js(除了模块化相关文件)压缩后输出到编译目录<code>./lib</code></li>
+            <li><code>_src/js/</code>中的js输出到编译目录<code>./js</code></li>
+        </ol>
         <h3 id="compile-image">图片</h3>
+        <p>项目内所有图片经过<a href="https://www.npmjs.com/package/gulp-imagemin" target="_blank">gulp-imagemin</a>插件压缩，输出到编译目录<code>./img</code></p>
+        <h3 id="compile-widget">组件</h3>
+        <p>组件定义了一个独立的页面片段，用于在模板中通过组件标签引用，编译过程不会输出(组件脚本除外，详见<a href="#compile-template">【模板编译】</a>)</p>
+        <p>一个组件体现为<code>include/</code>中的一个文件夹，包含模板(<code>temp.html</code>)、样式(<code>style.less</code>)、脚本(<code>script.js</code>)，标签语法：</p>
+        <pre>
+            <code>
+&lt;!--=require 组件文件夹名称 (组件模板数据)--&gt;
+//示例
+&lt;!--=require header--&gt;
+&lt;!--=require uploadImg {&quot;val&quot;:&quot;&quot;}--&gt;
+            </code>
+        </pre>
+        <p>如果组件标签中包含组件模板数据，那么组件模板(<code>temp.html</code>)会经过<code>_.template</code>渲染，语法见<a href="https://lodash.com/docs/4.17.2#template" target="_blank">lodash文档</a></p>
+        <p>为使组件可以在一个页面中多次调用，组件支持<code>uuid</code>特性，每次调用会生成一个6位随机字符串，组件样式和组件脚本中的<code>uuid</code>会与组件模板中的<code>uuid</code>保持一致，例如可以给节点添加随机且唯一的id，在js中使用id选择器就不会造成混淆</p>
 
         <h3 id="compile-font">字体</h3>
-
+        <p>字体文件源目录输出</p>
+        <h3 id="compile-template">模板</h3>
+        <p>模板编译经过以下流程：</p>
+        <ol>
+            <li>查找组件标签，编译组件模板内容，替换组件标签</li>
+            <li>收集组件css内容，模板编译结束后调起css编译程序，届时组件css将编译到最终的style.css中</li>
+            <li>收集组件script内容，包装成符合seajs模块规范，如果组件脚本数量大于1，将脚本合并成打包js文件输出到<code>include/</code>，模板页面底部将自动添加js链接，引用同样组件的模板可以复用已打包的脚本；如果只有1个组件脚本，脚本内容将内嵌到模板页面底部；如果该组件使用了<code>uuid</code>，那么该脚本也会内嵌在页面底部，因为<code>uuid</code>的唯一性使脚本失去了复用价值</li>
+            <li>替换占位符</li>
+            <li>输出到产出文件夹<code>./</code></li>
+        </ol>
+        <p>注：判断组件css和script个数的依据不是文件存在，而是内容不为空</p>
+        <h3 id="compile-ui">样式</h3>
+        <p>UI组件存放于<code>_component/</code>，<code>_src/css/config.less</code>是less配置文件，<code>_src/css/responsive.less</code>、<code>_src/css/resp-midd.less</code>、<code>_src/css/resp-smal.less</code>是响应式样式文件，这些文件可以按需在<code>_src/css/style.less</code>中引用，最终编译到产出目录<code>./css/style.css</code>中，不会单独输出到产出文件，他们的修改会触发<code>_src/css/style.less</code>的重新编译；</p>
+        <p>项目里的其他css文件将按原相对路径输出到产出文件夹。</p>
+        
     </section>
     
-    <section class="wrap" id="include">
-        <h2>模板引入</h2>
-        <h3 id="html-include">html引入</h3>
-        <p>html中可以通过<code>&lt;!--=include header/temp.html --&gt;</code>语法引入<code>_src/include</code>下的html文件</p>
-        <h3 id="css-include">css引入</h3>
-        <p>css中可以通过<code>/*=include header/style.less */</code>语法引入<code>_src/include</code>下的css文件</p>
-    </section>
-    <section class="wrap" id="other">
-        <h2>其他</h2>
-        <h3 id="imgmin">图片压缩</h3>
-        <p>支持JPG,jpg,png,gif格式图片压缩</p>
-    </section>
     <footer class="wrap oh tc">
    <div class="row "> <a href="#" title="返回顶部" class="dib foot_logo gotop">
 	   <figure></figure>
@@ -167,7 +201,7 @@
 	Acknowledgements : seajs \ bootstrap \ foundation \ ... </p>
 	</div>
 </footer>
-    <script src="/docs/lib/sea.js" id="seajsnode" ></script>
+    <script src="/Flow-CLI/docs/lib/sea.js" id="seajsnode" ></script>
     <script>
     seajs.use('js/doc');
     </script>
