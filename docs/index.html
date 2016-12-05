@@ -25,15 +25,14 @@
     <header><h1>front-flow-cli</h1></header>
     <nav class="wrap nav" id="nav">导航生成中...</nav>
     <section class="wrap" id="overall">
-        <h2>关于</h2>
-        <h3 id="overall-intro">概述</h3>
-        <p> front-flow-cli是专为front-flow前端工作流开发的命令行工具，实现自动初始化、组件化开发、预处理、静态资源优化、图片压缩等前端自动化需求。</p>
-        <h4>front-flow项目结构</h4>
-        <p>初始化命令将从<a href="https://github.com/tower1229/front-flow-template" target="_blank">github</a>获取一个空白front-flow项目，front-flow项目中以下划线开头的目录为编译资源，开发完成后不需要部署到服务器</p>
+        <h2>概述</h2>
+        <h3 id="overall-intro">关于</h3>
+        <p>front-flow-cli是front-flow前端工作流的配套命令行工具，实现自动初始化、组件化开发、预处理、静态资源优化、图片压缩等前端自动化需求。</p>
+        <p>典型的front-flow模板项目结构如下，其中下划线<code>(_)</code>开头的目录为编译资源，编译后不需要部署到服务器</p>
         <pre>
-      <code class="javascript"> 
+            <code class="javascript"> 
   |--_component/                //UI组件
-  |-- _src/                     //开发目录
+  |-- _src/                     //源码目录
   |    |-- css/
   |    |-- font/
   |    |-- img/
@@ -43,79 +42,111 @@
   |    |-- index.html
   |    |-- seajs.config.js
   |    `-- favicon.ico 
-  |-- modules/                  //seajs插件库
-  `-- dist/                     //编译目录
-  
-        </code>
-  </pre>
-        <h3 id="getStart">使用</h3>
-        <h4 id="download">安装</h4>
+  |-- modules/                  //seajs-modules
+  `-- config.json               //编译配置
+                </code>
+          </pre>
+        <h3 id="getStart">安装</h3>
         <p>1. 安装<a href="https://nodejs.org/en/" target="_blank">nodejs</a>(>=6.5.0)</p>
         <p>2. npm全局安装：<code>npm install front-flow-cli -g</code></p>
-        <h4>快速开始</h4>
-        <p>1. 打开命令行工具，定位到项目目录</p>
-        <p>2. <code>flow init</code>将在当前目录初始化一个空白front-flow项目</p>
-        <p>3. <code>flow run</code>启动开发服务(localhost:3000)，实时监听文件修改，编译并刷新浏览器</p>
-        <p>4. <code>flow build</code>将编译当前项目至<code>./dist</code></p>
-    </section>
-    <section class="wrap" id="css">
-        <h2>UI</h2>
-        <p>UI被拆分成多个独立的组件，在<code>_src/css/style.less</code>中配置使用，可以只选择需要的组件</p>
-        <h3 id="css-config">组件配置</h3>
-        <p>全局UI变量均在<code>_src/css/config.less</code>中配置，UI组件原则上都会使用该配置，开发中也应该默认使用配置清单中的变量，使项目风格便于统一调整</p>
-        <h3 id="css-ui">组件列表</h3>
+        <p>3. 安装完成，查看版本号：<code>flow -V</code></p>
+        <h3 id="command">命令</h3>
+        <p>1. <code>flow init</code>在当前目录初始化一个<a href="https://github.com/front-flow/front-flow-template" target="_blank">front-flow-template</a>项目</p>
+        <p>2. <code>flow build</code>编译当前项目</p>
+        <p>3. <code>flow run</code>编译当前项目并启动开发服务，实时编译并刷新浏览器</p>
+        <h3 id="setup">配置</h3>
+        编译相关的所有配置均在<code>config.json</code>中设置：
         <table class="table table-hover">
             <tr>
-                <td>btn.less</td>
-                <td>按钮组件，包含普通按钮，幽灵按钮，链接按钮</td>
+                <td>projectDir</td>
+                <td>
+                    项目源码目录，默认"_src"
+                </td>
             </tr>
             <tr>
-                <td>color.less</td>
-                <td>色彩组件，包含文字颜色，背景颜色</td>
+                <td>distDir</td>
+                <td>
+                    编译产出目录，默认"dist"
+                </td>
             </tr>
             <tr>
-                <td>form.less</td>
-                <td>表单组件</td>
+                <td>port</td>
+                <td>
+                    开发服务端口号，默认3000
+                </td>
             </tr>
             <tr>
-                <td>grid.less</td>
-                <td>栅格组件</td>
+                <td>homePage</td>
+                <td>
+                    开发服务起始页面，默认"index.html"
+                </td>
             </tr>
             <tr>
-                <td>iconfont.less</td>
-                <td>图标字体组件，依赖_src/font/</td>
+                <td>serverRoot</td>
+                <td>
+                    站点部署路径，默认""，即根目录
+                </td>
             </tr>
             <tr>
-                <td>iconsprite.less</td>
-                <td>精灵小图标组件</td>
+                <td>reloadDelay</td>
+                <td>
+                    开发服务刷新延时，默认0，单位ms
+                </td>
             </tr>
             <tr>
-                <td>label.less</td>
-                <td>标签组件</td>
+                <td>rootHolder</td>
+                <td>
+                    源码中引用站点部署路径的变量名
+                </td>
             </tr>
             <tr>
-                <td>reset.less</td>
-                <td>浏览器样式重置</td>
+                <td>projectHolder</td>
+                <td>
+                    源码中引用项目源码目录的变量名
+                </td>
             </tr>
             <tr>
-                <td>table.less</td>
-                <td>表格组件</td>
+                <td>distHolder</td>
+                <td>
+                    源码中引用产出目录的变量名
+                </td>
             </tr>
             <tr>
-                <td>tool.less</td>
-                <td>常用工具库</td>
+                <td>UUIDHolder</td>
+                <td>
+                    源码中生成一个随机6位数字字母组合的变量名，仅用于组件中html和script成对使用
+                </td>
+            </tr>
+            <tr>
+                <td>checkUpdate</td>
+                <td>
+                    是否自动检测新版本，默认true
+                </td>
+            </tr>
+            <tr>
+                <td>compress</td>
+                <td>
+                    编译时是否压缩代码，默认true
+                </td>
             </tr>
         </table>
-        <h3 id="css-compile">编译过程</h3>
-        <p>css编译包括合并文件、less编译、auto prefix三个过程</p>
     </section>
-    <section class="wrap" id="js">
-        <h2>脚本</h2>
-        <h3 id="js-system">js开发体系</h3>
-        <p>js开发体系与frontend一致，<a href="http://zangtao.org/projects/frontend/#js" target="_blank">点此了解</a></p>
-        <h3 id="js-compile">编译过程</h3>
+    <section class="wrap" id="css">
+        <h2>编译过程</h2>
+        <h3 id="compile-ui">UI</h3>
+        <p><code>_component/</code>用于存放UI组件，<code>_src/css/config.less</code>是less配置文件，<code>_src/css/responsive.less</code>、<code>_src/css/resp-midd.less</code>、<code>_src/css/resp-smal.less</code>是响应式样式文件，这些文件可以按需在<code>_src/css/style.less</code>中引用，最终编译到<code>style.css</code>中，不会单独输出到产出文件，他们的修改会触发<code>_src/css/style.less</code>的重新编译；</p>
+        <p>项目里的其他<code>css/less</code>文件将按原相对路径输出到产出文件夹。</p>
+        
+        <h3 id="compile-script">脚本</h3>
+        <p>...</p>
+        <h3 id="compile-template">模板</h3>
         <p>js编译包含两大部分，一是非模块化js及不需要处理的业务js直接发布，二是seajs相关文件会合并为一个sea.js文件并发布</p>
+        <h3 id="compile-image">图片</h3>
+
+        <h3 id="compile-font">字体</h3>
+
     </section>
+    
     <section class="wrap" id="include">
         <h2>模板引入</h2>
         <h3 id="html-include">html引入</h3>
