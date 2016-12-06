@@ -150,7 +150,6 @@ const types = {
         </pre>
         
         <h3 id="compile-script">脚本</h3>
-        <p>js编译包含两大部分，一是非模块化js及不需要处理的业务js直接发布，二是seajs相关文件会合并为一个sea.js文件并发布</p>
         <p>脚本编译经过以下流程：</p>
         <ol>
             <li>模块化相关文件合并压缩输出到编译目录<code>/lib/seajs.js</code>，包括：<code>'_src/lib/seajs/sea.js'</code>、<code>'_src/seajs.config.js'</code>、<code>'_src/lib/seajs/manifest.js'</code>、<code>'_src/lib/seajs/seajs-localcache.js'</code>
@@ -190,7 +189,7 @@ const types = {
         <h3 id="compile-ui">样式</h3>
         <p>UI组件存放于<code>_component/</code>，<code>_src/css/config.less</code>是less配置文件，<code>_src/css/responsive.less</code>、<code>_src/css/resp-midd.less</code>、<code>_src/css/resp-smal.less</code>是响应式样式文件，这些文件可以按需在<code>_src/css/style.less</code>中引用，最终编译到产出目录<code>./css/style.css</code>中，不会单独输出到产出文件，他们的修改会触发<code>_src/css/style.less</code>的重新编译；</p>
         <p>项目里的其他css文件将按原相对路径输出到产出文件夹。</p>
-        
+        <p>输出前压缩、加浏览器前缀、替换占位符</p>
     </section>
     
     <footer class="wrap oh tc">
