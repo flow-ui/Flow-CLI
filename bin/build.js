@@ -1,5 +1,6 @@
-const path = require('path');
+const os = require('os');
 const fs = require('fs');
+let path = require('path');
 
 const repl = require('repl');
 const ora = require('ora');
@@ -22,10 +23,15 @@ const util = require('./util');
 const globalConfig = require('./paths')();
 const pkg = require('../package.json');
 
-const distHolderFinal = path.format({
+if(os.type()==='Windows_NT'){
+	path = path.win32.posix;
+}
+
+let distHolderFinal = path.win32.posix.format({
 	dir: globalConfig.serverRoot,
 	base: globalConfig.distDir
 });
+
 let spinner = ora();
 //全局组件缓存
 let widgets = {};
