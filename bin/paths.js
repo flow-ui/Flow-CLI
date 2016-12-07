@@ -12,13 +12,23 @@ const types = {
 const getPath = function() {
 	if (util.isExist(configFile)) {
 		let userConfig = require(configFile);
-		let globalConfig = {};
+		let globalConfig = {
+			root: './',
+			types: types
+		};
+		let distBase = userConfig.distDir;
+		//合并userConfig
 		for (let x in userConfig) {
 			if (userConfig.hasOwnProperty(x)) {
 				globalConfig[x] = userConfig[x];
 			}
 		}
-		globalConfig.types = types;
+		if(path.isAbsolute(userConfig.distDir)){
+			let distObj = path.parse(userConfig.distDir);
+			globalConfig.distDir = distObj.base;
+			globalConfig.root = distObj.dir;
+			distBase = path.join(distObj.dir, globalConfig.distDir);
+		}
 		globalConfig.paths = {
 			scriptConcat: [path.join(userConfig.projectDir, '/lib/seajs/sea.js'), globalConfig.compress ? path.join(userConfig.projectDir, '/seajs.config.js') : '', path.join(userConfig.projectDir, '/lib/seajs/manifest.js'), path.join(userConfig.projectDir, '/lib/seajs/seajs-localcache.js')],
 			scriptApp: [path.join(userConfig.projectDir, '/js/*.{' + types.script + '}')],
@@ -33,12 +43,13 @@ const getPath = function() {
 			include: path.join(userConfig.projectDir, '/include')
 		};
 		globalConfig.dist = {
-			lib: path.join(userConfig.distDir, './lib'),
-			js: path.join(userConfig.distDir, './js'),
-			css: path.join(userConfig.distDir, './css'),
-			font: path.join(userConfig.distDir, './font'),
-			img: path.join(userConfig.distDir, './img'),
-			html: path.join(userConfig.distDir, './')
+			base: distBase,
+			lib: path.join(distBase, './lib'),
+			js: path.join(distBase, './js'),
+			css: path.join(distBase, './css'),
+			font: path.join(distBase, './font'),
+			img: path.join(distBase, './img'),
+			html: path.join(distBase, './')
 		};
 		return globalConfig;
 	} else {

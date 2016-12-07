@@ -1,6 +1,6 @@
 {
   "name": "front-flow-cli",
-  "version": "3.2.6",
+  "version": "3.3.0",
   "description": "为front-flow项目开发的命令行工具",
   "keywords": [
     "frontend",
@@ -47,6 +47,9 @@
     "node": ">= 6.5.0"
   },
   "logs": [{
+    "version": "3.3.0",
+    "description": "distDir支持绝对路径"
+  }, {
     "version": "3.2.6",
     "description": "uuid bug fix；增加编译细节输出"
   }, {

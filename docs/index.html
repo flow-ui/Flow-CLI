@@ -9,16 +9,16 @@
     <title>Flow-CLI</title>
     <meta content="Flow-CLI,front-flow" name="Keywords">
     <meta content="Flow-CLI是专为front-flow前端工作流开发的命令行工具，实现自动初始化、组件化开发、预处理、静态资源优化、图片压缩等前端自动化需求。" name="Description">
-    <link href="/Flow-CLI/docs/favicon.ico" rel="icon">
-<link href="/Flow-CLI/docs/css/style.css" rel="stylesheet">
-<link href="/Flow-CLI/docs/lib/highlight/styles/github.css" rel="stylesheet">
-<link href="/Flow-CLI/docs/css/doc.css" rel="stylesheet">
+    <link href="/Flow-CLI\docs/favicon.ico" rel="icon">
+<link href="/Flow-CLI\docs/css/style.css" rel="stylesheet">
+<link href="/Flow-CLI\docs/lib/highlight/styles/github.css" rel="stylesheet">
+<link href="/Flow-CLI\docs/css/doc.css" rel="stylesheet">
 <script type="text/javascript">
 	if(window.location.href.indexOf('https')===0){
 		document.write('<meta http-equiv="Content-Security-Policy" content="upgrade-insecure-requests" />');
 	}
 </script>
-<!--[if lt IE 9]><script src="/Flow-CLI/docs/lib/H5shiv.js"></script><![endif]-->
+<!--[if lt IE 9]><script src="/Flow-CLI\docs/lib/H5shiv.js"></script><![endif]-->
 </head>
 
 <body class="hasNav">
@@ -69,7 +69,8 @@
             <tr>
                 <td>distDir</td>
                 <td>
-                    编译产出目录，默认"dist"
+                    编译输出目录，默认"dist"，也支持绝对路径，例如<code>E:\\IIS\\frontend\\web</code>
+                    <p>注：当用绝对路径将编译结果输出到项目以外的目录时，<code>modules</code>(模块库)不会拷贝过去，为保证预览效果需要自行拷贝或配置远程模块库</p>
                 </td>
             </tr>
             <tr>
@@ -87,7 +88,7 @@
             <tr>
                 <td>serverRoot</td>
                 <td>
-                    站点部署路径，默认""，即根目录
+                    站点部署路径，默认""，即站点根目录
                 </td>
             </tr>
             <tr>
@@ -123,7 +124,7 @@
             <tr>
                 <td>checkUpdate</td>
                 <td>
-                    是否自动检测新版本，默认true
+                    编译前是否检测新版本，默认true
                 </td>
             </tr>
             <tr>
@@ -191,7 +192,13 @@ const types = {
         <p>项目里的其他css文件将按原相对路径输出到产出文件夹。</p>
         <p>输出前压缩、加浏览器前缀、替换占位符</p>
     </section>
-    
+    <section class="wrap">
+        <h2 id="other">其他</h2>
+        <h3 id="logs">更新日志</h3>
+        <div id="versionLogs">
+            加载中...
+        </div>
+    </section>
     <footer class="wrap oh tc">
    <div class="row "> <a href="#" title="返回顶部" class="dib foot_logo gotop">
 	   <figure></figure>
@@ -200,9 +207,34 @@ const types = {
 	Acknowledgements : seajs \ bootstrap \ foundation \ ... </p>
 	</div>
 </footer>
-    <script src="/Flow-CLI/docs/lib/sea.js" id="seajsnode" ></script>
+    <script src="/Flow-CLI\docs/lib/sea.js" id="seajsnode" ></script>
     <script>
     seajs.use('js/doc');
+    </script>
+    <script type="text/javascript">
+        define('logs',function(require){
+            var $ = require('jquery');
+            var render = function(data){
+                var html = '<table class="table">';
+                $.each(data,function(i,e){
+                    var tr = '<tr><td>'+e.version+'</td><td>'+e.description+'</td></tr>';
+                    html += tr;
+                });
+                html += '</table>';
+                $('#versionLogs').html(html);
+            };
+            $.ajax({
+                url:'https://raw.githubusercontent.com/tower1229/Flow-CLI/master/package.json',
+                dataType:'json',
+                success:function(res){
+                    var data = res.logs;
+                    if(data){
+                        render(data);
+                    }
+                }
+            });
+        });
+        seajs.use('logs');
     </script>
 </body>
 

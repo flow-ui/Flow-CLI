@@ -1,3 +1,5 @@
+const path = require('path');
+
 const del = require('del');
 const gulp = require('gulp');
 const gutil = require('gulp-util');
@@ -8,8 +10,8 @@ const globalConfig = require('./paths')();
 const types = globalConfig.types;
 const ora = require('ora');
 let spinner = ora();
-let reload;
 
+let reload;
 let watchHandle = function(type, file) {
 	let ext = file.match(/.*\.{1}([^.]*)$/) ? file.match(/.*\.{1}([^.]*)$/)[1] : null,
 		compileExt,
@@ -87,7 +89,7 @@ let run = function() {
 	buildCore.build(function() {
 		browserSync.init({
 			server: {
-				baseDir: './',
+				baseDir: globalConfig.root,
 				directory: true
 			},
 			startPath: globalConfig.distDir + "/" + globalConfig.homePage,
@@ -102,8 +104,8 @@ let run = function() {
 				browserSync.reload();
 			};
 			console.log(
-				gutil.colors.green("[开发路径] ") + "/" + globalConfig.projectDir +
-				gutil.colors.green("\n[编译路径] ") + "/" + globalConfig.distDir +
+				gutil.colors.green("[开发路径] ") + process.cwd() + path.sep + globalConfig.projectDir +
+				gutil.colors.green("\n[编译路径] ") + globalConfig.dist.base +
 				gutil.colors.green("\n[发布地址] ") + "http://localhost:" + globalConfig.port
 			);
 			spinner.text = '服务已启动...';

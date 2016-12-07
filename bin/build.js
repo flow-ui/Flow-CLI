@@ -22,9 +22,11 @@ const util = require('./util');
 const globalConfig = require('./paths')();
 const pkg = require('../package.json');
 
+const distHolderFinal = path.format({
+	dir: globalConfig.serverRoot,
+	base: globalConfig.distDir
+});
 let spinner = ora();
-const distHolderFinal = globalConfig.serverRoot ? (globalConfig.serverRoot + '/' + globalConfig.distDir) : globalConfig.distDir;
-
 //全局组件缓存
 let widgets = {};
 let getWidget = function(widgetName, type, page, isPath) {
@@ -39,13 +41,13 @@ let getWidget = function(widgetName, type, page, isPath) {
 	if (!(/\.html$/).test(widgetName)) {
 		switch (type) {
 			case "temp":
-				sourcePath = path.join(includePath, '/temp.html');
+				sourcePath = path.join(includePath, 'temp.html');
 				break;
 			case "style":
-				sourcePath = path.join(includePath, '/style.less');
+				sourcePath = path.join(includePath, 'style.less');
 				break;
 			case "script":
-				sourcePath = path.join(includePath, '/script.js');
+				sourcePath = path.join(includePath, 'script.js');
 				break;
 			case "alise":
 				sourcePath = widgetName + 'alise';
@@ -217,7 +219,7 @@ const cssNormalOut = function(option) {
 		});
 };
 
-const imageMin = function(option){
+const imageMin = function(option) {
 	// {
 	// 	src:
 	// 	dest:
@@ -240,7 +242,7 @@ const imageMin = function(option){
 const scriptLib = function(filePath, callback) {
 	if (!globalConfig.compress) {
 		scriptsNormalOut({
-			src: path.join(globalConfig.projectDir, '/seajs.config.js'),
+			src: path.join(globalConfig.projectDir, 'seajs.config.js'),
 			dest: globalConfig.distDir
 		});
 	}
@@ -309,12 +311,12 @@ script.prototype.todoList = [scriptLib, scriptApp];
 let image = function(filePath, callback) {
 	spinner.text = '正在构建image';
 	spinner.render();
-	if(!filePath){
+	if (!filePath) {
 		filePath = globalConfig.paths.imageAll;
 	}
 	imageMin({
 		src: filePath,
-		dest: globalConfig.distDir,
+		dest: globalConfig.dist.base,
 		callback: callback
 	});
 };
@@ -341,7 +343,7 @@ let css = function(filePath, callback) {
 	for (let x in widgets) {
 		if (widgets.hasOwnProperty(x)) {
 			if (widgets[x].style) {
-				importList.push(path.join(globalConfig.paths.include, x, '/style.less'));
+				importList.push(path.join(globalConfig.paths.include, x, 'style.less'));
 			}
 		}
 	}
@@ -374,7 +376,7 @@ let css = function(filePath, callback) {
 			let getpathreg = new RegExp(globalConfig.projectDir + '\\\\([^\\\\]+)\\\\.+\\.[^\\.]+');
 			let destmatch = otherTarget.match(getpathreg);
 			if (Array.isArray(destmatch)) {
-				destTarget = path.join(destTarget, '/' + destmatch[1]);
+				destTarget = path.join(destTarget, destmatch[1]);
 			}
 		}
 		cssNormalOut({
@@ -442,7 +444,7 @@ let html = function(filePath, callback) {
 		//新增include模板
 		return null;
 	}
-	
+
 	gulp.src(compileTarget)
 		.pipe(tap(function(file) {
 			//uuid组件缓存
@@ -459,8 +461,8 @@ let html = function(filePath, callback) {
 					result = pageWidget[name][type];
 				} else {
 					result = getWidget(name, type, file.path, isPath);
-					if(uuid && uuid.split){
-						if(!uuidCollection[type]){
+					if (uuid && uuid.split) {
+						if (!uuidCollection[type]) {
 							uuidCollection[type] = {};
 						}
 						uuidCollection[type][uuid] = result.replace(globalConfig.UUIDHolder, uuid);
@@ -546,10 +548,10 @@ let html = function(filePath, callback) {
 			}
 			//带随机数脚本
 			let pageWidgetInsert = '<script>';
-			for(let x in uuidCollection.script){
+			for (let x in uuidCollection.script) {
 				if (uuidCollection.script.hasOwnProperty(x)) {
 					let cont = uuidCollection.script[x];
-					if(cont){
+					if (cont) {
 						pageWidgetInsert += `
 define("${x}-inline", function(require, exports, module) {
 	${cont}
@@ -572,9 +574,9 @@ seajs.use("${x}-inline");
 	seajs.use("${widgetName}-inline");
 `;
 					}
-					if(pageWidgetInsert === '<script>'){
+					if (pageWidgetInsert === '<script>') {
 						pageWidgetInsert = '';
-					}else{
+					} else {
 						pageWidgetInsert += '</script>';
 					}
 				} else {
@@ -605,9 +607,9 @@ seajs.use("${x}-inline");
 
 					let pageWidgetName = pageWidgetNames.join('-') + '.js';
 					let pageWidgetDest = path.join(globalConfig.serverRoot, globalConfig.distDir, './include');
-					if(pageWidgetInsert === '<script>'){
+					if (pageWidgetInsert === '<script>') {
 						pageWidgetInsert = '';
-					}else{
+					} else {
 						pageWidgetInsert += '</script>';
 					}
 					pageWidgetInsert += '\n<script src="' + path.join('/', path.join(pageWidgetDest, pageWidgetName)) + '"></script>\n';
@@ -631,10 +633,10 @@ seajs.use("${x}-inline");
 						});
 					}
 				}
-			}else{
-				if(pageWidgetInsert === '<script>'){
+			} else {
+				if (pageWidgetInsert === '<script>') {
 					pageWidgetInsert = '';
-				}else{
+				} else {
 					pageWidgetInsert += '</script>';
 				}
 			}
