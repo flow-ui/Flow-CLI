@@ -302,9 +302,9 @@ let script = function(filePath, callback) {
 				getWidget(widgetMatch[1], 'script', true);
 				return html(widgets[widgetMatch[1]].alise, callback);
 			}
-		} else if (filePath.indexOf(path.normalize('modules/')) > -1) {
+		} else if (filePath.indexOf('modules\\') > -1) {
 			return console.log('\n请打开 ' +
-				gutil.colors.cyan(globalConfig.projectDir + '/lib/seajs/manifest.js') +
+				gutil.colors.cyan([globalConfig.projectDir, 'lib', 'seajs','manifest.js'].join(path.sep)) +
 				' 更新对应模块');
 		}
 	}

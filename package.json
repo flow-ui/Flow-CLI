@@ -1,6 +1,6 @@
 {
   "name": "front-flow-cli",
-  "version": "3.3.1",
+  "version": "3.3.2",
   "description": "为front-flow项目开发的命令行工具",
   "keywords": [
     "frontend",
@@ -47,6 +47,9 @@
     "node": ">= 6.5.0"
   },
   "logs": [{
+    "version": "3.3.2",
+    "description": "修改js模块导致开发服务异常中断bug"
+  }, {
     "version": "3.3.1",
     "description": "修正windows平台路径分隔符"
   }, {
