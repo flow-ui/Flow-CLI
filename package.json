@@ -48,7 +48,7 @@
   },
   "logs": [{
     "version": "3.3.3",
-    "description": "非压缩模式seajs.config文件也会合并"
+    "description": "非压缩模式seajs.config文件也会合并；断网无法启动本地服务bug"
   }, {
     "version": "3.3.2",
     "description": "修改js模块导致开发服务异常中断bug"

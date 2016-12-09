@@ -21,8 +21,8 @@ let watchHandle = function(type, file) {
 				delfilepath = delfilepath.replace('.' + ext, '.' + compileExt);
 			}
 			del(delfilepath).then(function(paths) {
-				if(paths.length){
-					console.log(gutil.colors.magenta('\ndelete: ')+ paths.join(' '));
+				if (paths.length) {
+					console.log(gutil.colors.magenta('\ndelete: ') + paths.join(' '));
 				}
 			});
 		};
@@ -96,6 +96,10 @@ let run = function() {
 			reloadDelay: globalConfig.reloadDelay,
 			reloadDebounce: globalConfig.reloadDelay,
 			port: globalConfig.port,
+			ghostMode: false,
+			online: false,
+			notify: false,
+			scrollProportionally: false,
 			logLevel: "silent"
 		}, function() {
 			reload = function() {
