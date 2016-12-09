@@ -537,10 +537,6 @@ let html = function(filePath, callback) {
 					}
 				}
 			}
-			//开发模式添加seajs.config文件
-			if (!globalConfig.compress) {
-				content = util.insertAfterStr(content, 'id="seajsnode"></script>', '\n<script src="/' + distHolderFinal + '/seajs.config.js"></script>');
-			}
 			//组件script合并
 			let pageWidgetNames = [];
 			let pageWidgetArray = [];
