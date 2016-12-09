@@ -154,7 +154,6 @@ const types = {
         <p>脚本编译经过以下流程：</p>
         <ol>
             <li>模块化相关文件合并压缩输出到编译目录<code>/lib/seajs.js</code>，包括：<code>'_src/lib/seajs/sea.js'</code>、<code>'_src/seajs.config.js'</code>、<code>'_src/lib/seajs/manifest.js'</code>、<code>'_src/lib/seajs/seajs-localcache.js'</code>
-                <p>注：不压缩的情况<code>'/seajs.config.js'</code>不参与合并，而是独立输出并自动在页面底部引用，便于开发中修改</p>
             </li>
             <li><code>_src/lib/</code>下的js(除了模块化相关文件)压缩后输出到编译目录<code>./lib</code></li>
             <li><code>_src/js/</code>中的js输出到编译目录<code>./js</code></li>
