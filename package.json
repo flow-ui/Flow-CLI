@@ -1,6 +1,6 @@
 {
   "name": "front-flow-cli",
-  "version": "3.3.3",
+  "version": "3.3.4",
   "description": "为front-flow项目开发的命令行工具",
   "keywords": [
     "frontend",
@@ -47,6 +47,9 @@
     "node": ">= 6.5.0"
   },
   "logs": [{
+    "version": "3.3.4",
+    "description": "css修改不触发编译的bug"
+  }, {
     "version": "3.3.3",
     "description": "非压缩模式seajs.config文件也会合并；断网无法启动本地服务bug"
   }, {

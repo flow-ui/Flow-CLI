@@ -23,7 +23,7 @@ const util = require('./util');
 const globalConfig = require('./paths')();
 const pkg = require('../package.json');
 
-if(os.type()==='Windows_NT'){
+if (os.type() === 'Windows_NT') {
 	path = path.win32.posix;
 }
 
@@ -304,7 +304,7 @@ let script = function(filePath, callback) {
 			}
 		} else if (filePath.indexOf('modules\\') > -1) {
 			return console.log('\n请打开 ' +
-				gutil.colors.cyan([globalConfig.projectDir, 'lib', 'seajs','manifest.js'].join(path.sep)) +
+				gutil.colors.cyan([globalConfig.projectDir, 'lib', 'seajs', 'manifest.js'].join(path.sep)) +
 				' 更新对应模块');
 		}
 	}
@@ -355,8 +355,9 @@ let css = function(filePath, callback) {
 	}
 	if (filePath && filePath.split) {
 		let widgetMatch = filePath.match(isIncludeReg);
+		let winFilepath = filePath.replace(/\\/g, path.sep);
 		globalConfig.paths.cssMain.forEach(function(e) {
-			if (filePath.indexOf(path.normalize(e)) > -1) {
+			if (winFilepath.indexOf(path.normalize(e)) > -1) {
 				mainTarget = true;
 			}
 		});
@@ -498,9 +499,9 @@ let html = function(filePath, callback) {
 						//使用_.template编译模板
 						if (widgetData && widgetData.trim()) {
 							let _tempdata;
-							try{
+							try {
 								_tempdata = JSON.parse(widgetData);
-							}catch(e){
+							} catch (e) {
 								return console.log("[" + includeName + "]组件的模板数据解析错误，或者引用语句没有在html中独占一行");
 							}
 							_tempdata.file = file; //不知道为什么gulp-util要求_.template数据必须含有file对象
