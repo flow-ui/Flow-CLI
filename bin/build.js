@@ -497,7 +497,11 @@ let html = function(filePath, callback) {
 						let widgetHTML = getPageWidget(includeName, 'temp');
 						//使用_.template编译模板
 						if (widgetData && widgetData.trim()) {
-							let _tempdata = JSON.parse(widgetData);
+							try{
+								let _tempdata = JSON.parse(widgetData);
+							}catch(e){
+								return console.log("[" + includeName + "]组件的模板数据解析错误，或者引用语句没有在html中独占一行");
+							}
 							_tempdata.file = file; //不知道为什么gulp-util要求_.template数据必须含有file对象
 							try {
 								widgetHTML = gutil.template(widgetHTML, _tempdata);
