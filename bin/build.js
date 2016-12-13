@@ -497,8 +497,9 @@ let html = function(filePath, callback) {
 						let widgetHTML = getPageWidget(includeName, 'temp');
 						//使用_.template编译模板
 						if (widgetData && widgetData.trim()) {
+							let _tempdata;
 							try{
-								let _tempdata = JSON.parse(widgetData);
+								_tempdata = JSON.parse(widgetData);
 							}catch(e){
 								return console.log("[" + includeName + "]组件的模板数据解析错误，或者引用语句没有在html中独占一行");
 							}
