@@ -11,16 +11,17 @@ const types = globalConfig.types;
 const ora = require('ora');
 let spinner = ora();
 
+const util = require('./util');
 let reload;
 let watchHandle = function(type, file) {
 	let ext = file.match(/.*\.{1}([^.]*)$/) ? file.match(/.*\.{1}([^.]*)$/)[1] : null,
 		compileExt,
 		delfile = function() {
-			let delfilepath = file.replace(new RegExp(globalConfig.projectDir), globalConfig.distDir);
+			let delfilepath = path.join( globalConfig.dist.base, file.replace(new RegExp(globalConfig.projectDir), ''));
 			if (compileExt === 'css' || compileExt === 'js') {
 				delfilepath = delfilepath.replace('.' + ext, '.' + compileExt);
 			}
-			del(delfilepath).then(function(paths) {
+			del(delfilepath, {force:true}).then(function(paths) {
 				if (paths.length) {
 					console.log(gutil.colors.magenta('\ndelete: ') + paths.join(' '));
 				}

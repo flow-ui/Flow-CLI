@@ -27,7 +27,7 @@ if (os.type() === 'Windows_NT') {
 	path = path.win32.posix;
 }
 
-let distHolderFinal = path.win32.posix.format({
+let distHolderFinal = path.format({
 	dir: globalConfig.serverRoot,
 	base: globalConfig.distDir
 });
@@ -317,12 +317,14 @@ script.prototype.todoList = [scriptLib, scriptApp];
 let image = function(filePath, callback) {
 	spinner.text = '正在构建image';
 	spinner.render();
+	let destPath = globalConfig.dist.img;
 	if (!filePath) {
 		filePath = globalConfig.paths.imageAll;
+		destPath = globalConfig.dist.base;
 	}
 	imageMin({
 		src: filePath,
-		dest: globalConfig.dist.base,
+		dest: destPath,
 		callback: callback
 	});
 };
