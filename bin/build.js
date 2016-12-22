@@ -18,6 +18,7 @@ const concat = require('gulp-concat');
 const changed = require('gulp-changed');
 const uglify = require('gulp-uglify');
 const tap = require('gulp-tap');
+const filter = require('gulp-filter');
 
 const util = require('./util');
 const globalConfig = require('./paths')();
@@ -191,6 +192,12 @@ const cssNormalOut = function(option) {
 	if (!option.mapsrc) {
 		option.mapsrc = './';
 	}
+	if (!Array.isArray(option.src)) {
+		option.src = [option.src];
+	}
+	const needCompile = filter(option.src.concat(['!**/*.css']), {
+		restore: true
+	});
 	gulp.src(option.src)
 		.pipe(plumber())
 		.pipe(tap(function(file) {
@@ -208,10 +215,12 @@ const cssNormalOut = function(option) {
 		.pipe(globalConfig.compress ? sourcemaps.init() : gutil.noop())
 		.pipe(replace(globalConfig.rootHolder, globalConfig.serverRoot))
 		.pipe(replace(globalConfig.projectHolder, globalConfig.projectDir))
+		.pipe(needCompile)
 		.pipe(less({
 			plugins: [autoprefix],
 			compress: globalConfig.compress
 		}))
+		.pipe(needCompile.restore)
 		.pipe(replace(globalConfig.distHolder, distHolderFinal))
 		.pipe(globalConfig.compress ? sourcemaps.write(option.mapsrc) : gutil.noop())
 		.pipe(gulp.dest(option.dest))
@@ -382,11 +391,13 @@ let css = function(filePath, callback) {
 	if (otherTarget) {
 		let destTarget = globalConfig.distDir;
 		if (otherTarget.split) {
+			console.log(otherTarget)
 			let getpathreg = new RegExp(globalConfig.projectDir + '\\\\([^\\\\]+)\\\\.+\\.[^\\.]+');
 			let destmatch = otherTarget.match(getpathreg);
 			if (Array.isArray(destmatch)) {
 				destTarget = path.join(destTarget, destmatch[1]);
 			}
+
 		}
 		cssNormalOut({
 			src: otherTarget,
