@@ -10,7 +10,6 @@ const types = {
 };
 const getPath = function(configFileName) {
 	configFileName = configFileName && configFileName.split ? configFileName.trim() : 'config';
-	console.log(configFileName);
 	let configFile = path.join(process.cwd(), './'+ configFileName +'.json');
 	if (util.isExist(configFile)) {
 		let userConfig = require(configFile);
