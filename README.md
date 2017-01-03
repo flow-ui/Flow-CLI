@@ -24,13 +24,13 @@
 
 在当前目录初始化一个[front-flow](https://github.com/front-flow/front-flow-template)项目模板
 
-###flow build
+###flow build [configName]
 
-编译当前开发目录
+编译当前开发目录，默认加载配置`config.json`，可指定配置文件名称
 
-###flow run
+###flow run [configName]
 
-编译并监听开发目录，启动实时预览服务
+编译并监听开发目录，启动实时预览服务，默认加载配置`config.json`，可指定配置文件名称
 
 ##文档
 
