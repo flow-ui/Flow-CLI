@@ -17,16 +17,18 @@ program
 	});
 
 program
-	.command('run')
+	.command('run [configName]')
 	.description('运行开发服务')
-	.action(function() {
+	.action(function(configName) {
+		process.configName = configName;
 		require('./run')();
 	});
 
 program
-	.command('build')
+	.command('build [configName]')
 	.description('编译打包')
-	.action(function() {
+	.action(function(configName) {
+		process.configName = configName;
 		require('./build').build();
 	});
 

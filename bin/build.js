@@ -21,7 +21,7 @@ const tap = require('gulp-tap');
 const filter = require('gulp-filter');
 
 const util = require('./util');
-const globalConfig = require('./paths')();
+const globalConfig = require('./paths')(process.configName);
 const pkg = require('../package.json');
 
 if (os.type() === 'Windows_NT') {

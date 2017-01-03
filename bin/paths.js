@@ -1,7 +1,6 @@
 const util = require('./util');
 const path = require('path');
 
-const configFile = path.join(process.cwd(), './config.json');
 const types = {
 	script: 'js,coffee',
 	css: 'css,less',
@@ -9,7 +8,10 @@ const types = {
 	html: 'htm,html',
 	font: 'eot,svg,ttf,woff'
 };
-const getPath = function() {
+const getPath = function(configFileName) {
+	configFileName = configFileName && configFileName.split ? configFileName.trim() : 'config';
+	console.log(configFileName);
+	let configFile = path.join(process.cwd(), './'+ configFileName +'.json');
 	if (util.isExist(configFile)) {
 		let userConfig = require(configFile);
 		let globalConfig = {
@@ -53,7 +55,7 @@ const getPath = function() {
 		};
 		return globalConfig;
 	} else {
-		console.log('config.json不存在！');
+		console.log(configFileName + '.json不存在！');
 		return process.exit();
 	}
 };

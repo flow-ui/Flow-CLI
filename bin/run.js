@@ -4,14 +4,15 @@ const del = require('del');
 const gulp = require('gulp');
 const gutil = require('gulp-util');
 const browserSync = require('browser-sync').create();
+const ora = require('ora');
+
 const watch = require('./watch');
 const buildCore = require('./build');
-const globalConfig = require('./paths')();
+const globalConfig = require('./paths')(process.configName);
 const types = globalConfig.types;
-const ora = require('ora');
-let spinner = ora();
-
 const util = require('./util');
+
+let spinner = ora();
 let reload;
 let watchHandle = function(type, file) {
 	let ext = file.match(/.*\.{1}([^.]*)$/) ? file.match(/.*\.{1}([^.]*)$/)[1] : null,
