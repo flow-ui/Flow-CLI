@@ -23,7 +23,7 @@ const filter = require('gulp-filter');
 const util = require('./util');
 const globalConfig = require('./paths')(process.configName);
 const pkg = require('../package.json');
-
+const isAbsolute = path.isAbsolute;
 if (os.type() === 'Windows_NT') {
 	path = path.win32.posix;
 }
@@ -95,6 +95,7 @@ let getWidget = function(widgetName, type, page, isPath) {
 let packages = {};
 
 const isIncludeReg = /include\\([^\\]+)\\|include\\([^\\\.]+\..+)/;
+
 //脚本合并
 const scriptsConcat = function(option) {
 	// {
@@ -303,6 +304,7 @@ let script = function(filePath, callback) {
 		};
 	spinner.text = '正在构建script';
 	spinner.render();
+	//运行中监听
 	if (filePath && filePath.split) {
 		var widgetMatch = filePath.match(isIncludeReg);
 		if (widgetMatch) {
@@ -311,15 +313,19 @@ let script = function(filePath, callback) {
 				getWidget(widgetMatch[1], 'script', true);
 				return html(widgets[widgetMatch[1]].alise, callback);
 			}
-		} else if (filePath.indexOf('modules\\') > -1) {
-			return console.log('\n请打开 ' +
-				gutil.colors.cyan([globalConfig.projectDir, 'lib', 'seajs', 'manifest.js'].join(path.sep)) +
-				' 更新对应模块');
+		} else {
+			if (filePath.indexOf(globalConfig.projectDir + '\\lib\\') === 0 || filePath.indexOf('seajs.config') > -1) {
+				scriptLib(filePath, callback);
+			} else if (filePath.indexOf(globalConfig.projectDir + '\\js\\') === 0) {
+				scriptApp(filePath, callback);
+			}
 		}
+	} else {
+		//初始编译
+		script.prototype.todoList.forEach(function(item, index) {
+			item(filePath, resolve);
+		});
 	}
-	script.prototype.todoList.forEach(function(item, index) {
-		item(filePath, resolve);
-	});
 };
 script.prototype.todoList = [scriptLib, scriptApp];
 
@@ -366,9 +372,9 @@ let css = function(filePath, callback) {
 	}
 	if (filePath && filePath.split) {
 		let widgetMatch = filePath.match(isIncludeReg);
-		let winFilepath = filePath.replace(/\\/g, path.sep);
+		let Path4OS = filePath.replace(/\\/g, path.sep);
 		globalConfig.paths.cssMain.forEach(function(e) {
-			if (winFilepath.indexOf(path.normalize(e)) > -1) {
+			if (Path4OS.indexOf(path.normalize(e)) > -1) {
 				mainTarget = true;
 			}
 		});
@@ -681,6 +687,33 @@ seajs.use("${x}-inline");
 		});
 };
 
+let copy = function(filePath, callback) {
+	let copyFile;
+	if (isAbsolute(globalConfig.dist.base)) {
+		if (filePath && filePath.split) {
+			copyFile = filePath;
+		} else if (Array.isArray(globalConfig.extendsPath) && globalConfig.extendsPath.length) {
+			spinner.text = '正在拷贝文件';
+			spinner.render();
+			copyFile = globalConfig.extendsPath;
+		}
+		gulp.src(copyFile, {
+				base: '.'
+			})
+			.pipe(gulp.dest(globalConfig.root))
+			.on('end', function() {
+				if (filePath) {
+					console.log('\n' + filePath + '已拷贝至发布目录')
+				}
+				if (typeof(callback) === 'function') {
+					callback();
+				}
+			});
+	} else if (typeof(callback) === 'function') {
+		callback();
+	}
+};
+
 let build = function(callback) {
 	let got = 0,
 		start = process.hrtime(),
@@ -751,13 +784,12 @@ let build = function(callback) {
 		}
 	});
 };
-build.prototype.todoList = [script, image, font, html]; //css编译将被html调起
+build.prototype.todoList = [copy, script, image, font, html]; //css编译将被html调起
 
 module.exports = {
 	build: build,
 	script: script,
-	scriptLib: scriptLib,
-	scriptApp: scriptApp,
+	copy: copy,
 	image: image,
 	font: font,
 	css: css,

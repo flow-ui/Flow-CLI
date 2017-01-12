@@ -1,13 +1,17 @@
 const chokidar = require('chokidar');
-let watch;
 
-watcher = function(projectFolder){
-	watch = chokidar.watch(['./_component', './modules', projectFolder], {
+const globalConfig = require('./paths')(process.configName);
+
+let watcher = function(projectFolder){
+	let watchArray = ['_component', projectFolder];
+	if(Array.isArray(globalConfig.extendsPath) && globalConfig.extendsPath.length){
+		watchArray = watchArray.concat(globalConfig.extendsPath);
+	}
+	return chokidar.watch(watchArray, {
 		ignored: /[\/\\]\.|(\.[^\.]*TMP[^\.]*$)/,
 		ignorePermissionErrors: true,
 		atomic: true
 	});
-	return watch;
 };
 
 module.exports = watcher;

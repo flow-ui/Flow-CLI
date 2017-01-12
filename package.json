@@ -1,6 +1,6 @@
 {
   "name": "front-flow-cli",
-  "version": "3.4.0",
+  "version": "3.5.0",
   "description": "基于nodejs的前端自动化工具",
   "keywords": [
     "frontend",
@@ -48,6 +48,9 @@
     "node": ">= 6.5.0"
   },
   "logs": [{
+    "version": "3.5.0",
+    "description": "增加extendsPath配置，支持添加额外的监听/发布目录"
+  }, {
     "version": "3.4.0",
     "description": "命令行增加指定配置文件功能，支持同目录子项目进程多开"
   }, {

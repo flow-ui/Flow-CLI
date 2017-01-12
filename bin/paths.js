@@ -8,6 +8,7 @@ const types = {
 	html: 'htm,html',
 	font: 'eot,svg,ttf,woff'
 };
+
 const getPath = function(configFileName) {
 	configFileName = configFileName && configFileName.split ? configFileName.trim() : 'config';
 	let configFile = path.join(process.cwd(), './'+ configFileName +'.json');

@@ -12,8 +12,13 @@ const globalConfig = require('./paths')(process.configName);
 const types = globalConfig.types;
 const util = require('./util');
 
+const isPathInDir = function(filePath, dir) {
+	filePath = filePath.replace(/\\/g, path.sep);
+	return filePath.indexOf(dir) === 0;
+};
 let spinner = ora();
 let reload;
+
 let watchHandle = function(type, file) {
 	let ext = file.match(/.*\.{1}([^.]*)$/) ? file.match(/.*\.{1}([^.]*)$/)[1] : null,
 		compileExt,
@@ -27,7 +32,19 @@ let watchHandle = function(type, file) {
 					console.log(gutil.colors.magenta('\ndelete: ') + paths.join(' '));
 				}
 			});
-		};
+		},
+		copyFile;
+	if(Array.isArray(globalConfig.extendsPath) && globalConfig.extendsPath.length){
+		globalConfig.extendsPath.forEach(function(ext, index) {
+			if (isPathInDir(file, ext.split('/*')[0])) {
+				copyFile = file;
+				return null;
+			}
+		});
+	}
+	if(copyFile){
+		return buildCore.copy(copyFile);
+	}
 	for (let key in types) {
 		if (types.hasOwnProperty(key)) {
 			if (types[key].indexOf(ext) > -1) {
@@ -38,16 +55,10 @@ let watchHandle = function(type, file) {
 	}
 	switch (compileExt) {
 		case 'script':
-			if (file.indexOf('\\lib\\') > -1 || file.indexOf('seajs.config') > -1) {
-				buildCore.scriptLib(file, type === 'add' ? null : reload);
-			} else if (file.indexOf('\\js\\') > -1) {
-				if (type === 'unlink') {
-					delfile();
-				} else {
-					buildCore.scriptApp(file, type === 'add' ? null : reload);
-				}
-			} else if (type === 'change') {
-				buildCore.script(file, reload);
+			if (type === 'unlink') {
+				delfile();
+			} else {
+				buildCore.script(file, type === 'add' ? null : reload);
 			}
 			break;
 		case 'img':
