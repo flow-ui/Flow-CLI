@@ -397,7 +397,6 @@ let css = function(filePath, callback) {
 	if (otherTarget) {
 		let destTarget = globalConfig.distDir;
 		if (otherTarget.split) {
-			console.log(otherTarget)
 			let getpathreg = new RegExp(globalConfig.projectDir + '\\\\([^\\\\]+)\\\\.+\\.[^\\.]+');
 			let destmatch = otherTarget.match(getpathreg);
 			if (Array.isArray(destmatch)) {
