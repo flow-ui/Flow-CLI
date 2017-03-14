@@ -3,7 +3,7 @@
 const program = require('commander');
 const pkg = require('../package.json');
 
-process.title = pkg.name + ' V' + pkg.version;
+process.title = 'Flow-CLI V' + pkg.version;
 
 program
 	.version(pkg.version)
