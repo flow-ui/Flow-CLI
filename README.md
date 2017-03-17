@@ -20,7 +20,7 @@
 
 ## 使用
 
-###flow init
+### flow init
 
 在当前目录初始化一个[front-flow](https://github.com/front-flow/front-flow-template)项目模板
 
