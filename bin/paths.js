@@ -32,7 +32,7 @@ const getPath = function(configFileName) {
 			distBase = path.join(distObj.dir, globalConfig.distDir);
 		}
 		globalConfig.paths = {
-			scriptConcat: [path.join(userConfig.projectDir, '/lib/seajs/sea.js'), path.join(userConfig.projectDir, '/seajs.config.js'), path.join(userConfig.projectDir, '/lib/seajs/manifest.js'), path.join(userConfig.projectDir, '/lib/seajs/seajs-localcache.js')],
+			scriptConcat: [path.join('./public/', '/lib/seajs/sea.js'), path.join(userConfig.projectDir, '/seajs.config.js'), path.join('./public/', '/lib/seajs/manifest.js'), path.join('./public/', '/lib/seajs/seajs-localcache.js')],
 			scriptApp: [path.join(userConfig.projectDir, '/js/*.{' + types.script + '}')],
 			scriptLib: [path.join(userConfig.projectDir, '/lib/**'), '!' + path.join(userConfig.projectDir, '/lib/seajs/**')],
 			imageAll: [path.join(userConfig.projectDir, '/**/*.{' + types.img + '}')],

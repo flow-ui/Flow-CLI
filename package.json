@@ -1,10 +1,11 @@
 {
   "name": "front-flow-cli",
-  "version": "3.5.0",
+  "version": "3.6.0",
   "description": "基于nodejs的前端自动化工具",
   "keywords": [
     "frontend",
     "front-flow",
+    "Flow-UI",
     "front-flow-cli"
   ],
   "author": "tower1229",
@@ -48,6 +49,9 @@
     "node": ">= 6.5.0"
   },
   "logs": [{
+    "version": "3.6.0",
+    "description": "seajs相关文件从项目内lib/目录移到项目外public/目录"
+  }, {
     "version": "3.5.0",
     "description": "增加extendsPath配置，支持添加额外的监听/发布目录"
   }, {

@@ -272,7 +272,7 @@ const scriptLib = function(filePath, callback) {
 		src: globalConfig.paths.scriptConcat,
 		name: 'sea.js',
 		dest: globalConfig.dist.lib,
-		mapsrc: './seajs',
+		mapsrc: './',
 		callback: callback
 	});
 
