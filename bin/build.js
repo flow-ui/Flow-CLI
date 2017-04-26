@@ -95,7 +95,11 @@ let getWidget = function(widgetName, type, page, isPath) {
 let packages = {};
 
 const isIncludeReg = /include\\([^\\]+)\\|include\\([^\\\.]+\..+)/;
-
+const uglifySet = {
+	output: {
+		quote_keys: true
+	}
+};
 //脚本合并
 const scriptsConcat = function(option) {
 	// {
@@ -133,7 +137,7 @@ const scriptsConcat = function(option) {
 		.pipe(replace(globalConfig.rootHolder, globalConfig.serverRoot))
 		.pipe(replace(globalConfig.projectHolder, globalConfig.projectDir))
 		.pipe(replace(globalConfig.distHolder, distHolderFinal))
-		.pipe(globalConfig.compress ? uglify() : gutil.noop())
+		.pipe(globalConfig.compress ? uglify(uglifySet) : gutil.noop())
 		.pipe(globalConfig.compress ? sourcemaps.write(option.mapsrc) : gutil.noop())
 		.pipe(gulp.dest(option.dest))
 		.on('end', function() {
@@ -166,7 +170,7 @@ const scriptsNormalOut = function(option) {
 		.pipe(replace(globalConfig.rootHolder, globalConfig.serverRoot))
 		.pipe(replace(globalConfig.projectHolder, globalConfig.projectDir))
 		.pipe(replace(globalConfig.distHolder, distHolderFinal))
-		.pipe(option.compress && globalConfig.compress ? uglify() : gutil.noop())
+		.pipe(option.compress && globalConfig.compress ? uglify(uglifySet) : gutil.noop())
 		.pipe(option.compress && globalConfig.compress ? sourcemaps.write(option.mapsrc) : gutil.noop())
 		.pipe(gulp.dest(option.dest))
 		.on('end', function() {

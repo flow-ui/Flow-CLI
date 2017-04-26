@@ -1,6 +1,6 @@
 {
   "name": "front-flow-cli",
-  "version": "3.6.0",
+  "version": "3.6.1",
   "description": "基于nodejs的前端自动化工具",
   "keywords": [
     "frontend",
@@ -49,6 +49,9 @@
     "node": ">= 6.5.0"
   },
   "logs": [{
+    "version": "3.6.1",
+    "description": "修复js压缩导致IE8报错bug"
+  }, {
     "version": "3.6.0",
     "description": "seajs相关文件从项目内lib/目录移到项目外public/目录"
   }, {
