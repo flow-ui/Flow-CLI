@@ -318,7 +318,7 @@ let script = function(filePath, callback) {
 				return html(widgets[widgetMatch[1]].alise, callback);
 			}
 		} else {
-			if (filePath.indexOf(globalConfig.projectDir + '\\lib\\') === 0 || filePath.indexOf('seajs.config') > -1) {
+			if (filePath.indexOf(globalConfig.projectDir + '\\lib\\') === 0 || filePath.indexOf('public\\lib\\seajs\\') === 0 || filePath.indexOf('seajs.config') > -1) {
 				scriptLib(filePath, callback);
 			} else if (filePath.indexOf(globalConfig.projectDir + '\\js\\') === 0) {
 				scriptApp(filePath, callback);

@@ -3,7 +3,7 @@ const chokidar = require('chokidar');
 const globalConfig = require('./paths')(process.configName);
 
 let watcher = function(projectFolder){
-	let watchArray = ['_component', projectFolder];
+	let watchArray = ['_component', 'public/lib/seajs', projectFolder];
 	if(Array.isArray(globalConfig.extendsPath) && globalConfig.extendsPath.length){
 		watchArray = watchArray.concat(globalConfig.extendsPath);
 	}
