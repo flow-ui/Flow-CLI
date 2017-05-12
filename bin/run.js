@@ -116,14 +116,16 @@ let run = function() {
 			logLevel: "silent"
 		}, function() {
 			reload = function() {
-				spinner.text = ('浏览器刷新(' + gutil.colors.magenta(++freshTimer) + ')');
+				spinner.text = ("localhost:" + gutil.colors.green(globalConfig.port) + ' reload(' + gutil.colors.magenta(++freshTimer) + ')');
 				spinner.render();
 				browserSync.reload();
 			};
 			console.log(
-				gutil.colors.green("[开发路径] ") + process.cwd() + path.sep + globalConfig.projectDir +
-				gutil.colors.green("\n[编译路径] ") + globalConfig.dist.base +
-				gutil.colors.green("\n[发布地址] ") + "http://localhost:" + globalConfig.port
+				gutil.colors.green(" ----------- ----- ---- --- -- -  -   -    -") +
+				gutil.colors.green("\n|") +" 开发路径: " + process.cwd() + path.sep + globalConfig.projectDir +
+				gutil.colors.green("\n|") +" 编译路径: " + process.cwd() + path.sep + globalConfig.dist.base +
+				gutil.colors.green("\n|") +" 发布端口: " + "localhost:" + globalConfig.port + 
+				gutil.colors.green("\n ----------- ----- ---- --- -- -  -   -    -")
 			);
 			spinner.text = '服务已启动...';
 			spinner.succeed();

@@ -1,6 +1,6 @@
 {
   "name": "front-flow-cli",
-  "version": "3.6.2",
+  "version": "3.6.3",
   "description": "基于nodejs的前端自动化工具",
   "keywords": [
     "frontend",
@@ -49,6 +49,9 @@
     "node": ">= 6.5.0"
   },
   "logs": [{
+    "version": "3.6.3",
+    "description": "命令行界面优化"
+  }, {
     "version": "3.6.2",
     "description": "将public/lib/seajs/**加入监听"
   }, {
