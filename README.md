@@ -3,6 +3,7 @@
 
 [![npm](https://img.shields.io/npm/v/front-flow-cli.svg)](https://www.npmjs.com/package/front-flow-cli/) [![DUB](https://travis-ci.org/tower1229/Flow-CLI.svg?branch=master)]() [![node](https://img.shields.io/node/v/front-flow-cli.svg)]() [![document](https://img.shields.io/website-up-down-green-red/http/shields.io.svg?maxAge=2592000)](https://tower1229.github.io/Flow-CLI/docs/) [![DUB](https://img.shields.io/dub/l/vibe-d.svg?maxAge=2592000)]()
 
+![](https://raw.githubusercontent.com/tower1229/Flow-CLI/master/docs/img/flow-cli-album.png)
 
 ## 功能
 
