@@ -23,7 +23,7 @@
 
 ### flow init
 
-在当前目录初始化一个[front-flow](https://github.com/front-flow/front-flow-template)项目模板
+在当前目录初始化一个[flow-ui](https://github.com/tower1229/Flow-UI)项目模板
 
 ### flow build [configName]
 
