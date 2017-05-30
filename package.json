@@ -1,15 +1,15 @@
 {
   "name": "front-flow-cli",
-  "version": "3.6.3",
-  "description": "基于nodejs的前端自动化工具",
+  "version": "3.6.4",
+  "description": "基于Nodejs的前端自动化工具",
   "keywords": [
     "frontend",
     "front-flow",
     "Flow-UI",
-    "front-flow-cli"
+    "Flow-CLI"
   ],
-  "author": "tower1229",
-  "license": "MIT",
+  "author": "tower1229@gmail.com",
+  "license": "GPL-3.0",
   "repository": {
     "type": "git",
     "url": "https://github.com/tower1229/Flow-CLI"
@@ -49,6 +49,9 @@
     "node": ">= 6.5.0"
   },
   "logs": [{
+    "version": "3.6.4",
+    "description": "远程模板url更换"
+  }, {
     "version": "3.6.3",
     "description": "命令行界面优化"
   }, {
