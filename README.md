@@ -1,9 +1,9 @@
 # Flow-CLI (front-flow-cli)
 基于nodejs的前端自动化工具
 
-[![npm](https://img.shields.io/npm/v/front-flow-cli.svg)](https://www.npmjs.com/package/front-flow-cli/) [![DUB](https://travis-ci.org/tower1229/Flow-CLI.svg?branch=master)]() [![node](https://img.shields.io/node/v/front-flow-cli.svg)]() [![document](https://img.shields.io/website-up-down-green-red/http/shields.io.svg?maxAge=2592000)](https://tower1229.github.io/Flow-CLI/docs/) [![license](https://img.shields.io/github/license/tower1229/Flow-CLI.svg)]()
+[![npm](https://img.shields.io/npm/v/front-flow-cli.svg)](https://www.npmjs.com/package/front-flow-cli/) [![DUB](https://travis-ci.org/tower1229/Flow-CLI.svg?branch=master)]() [![node](https://img.shields.io/node/v/front-flow-cli.svg)]() [![license](https://img.shields.io/github/license/tower1229/Flow-CLI.svg)]()
 
-![](https://raw.githubusercontent.com/tower1229/Flow-CLI/master/docs/img/flow-cli-album.png)
+![preview](https://raw.githubusercontent.com/tower1229/Flow-CLI/master/docs/img/flow-cli-album.png)
 
 ## 功能
 
@@ -19,7 +19,7 @@
 1. 安装nodejs(>=6.5.0)
 2. npm安装：`npm install front-flow-cli -g`
 
-## 使用
+## 命令
 
 ### flow init
 
@@ -35,7 +35,7 @@
 
 ## 文档
 
-https://tower1229.github.io/Flow-CLI/docs/
+[Flow-CLI Documention](https://tower1229.github.io/Flow-CLI/docs/)
 
 ## License 
 
