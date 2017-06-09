@@ -1,6 +1,6 @@
-
-# Flow-CLI (front-flow-cli)
-基于nodejs的前端自动化工具
+<br /><br />
+# Flow-CLI
+基于Nodejs/Gulp的前端自动化工具
 
 [![npm](https://img.shields.io/npm/v/front-flow-cli.svg)](https://www.npmjs.com/package/front-flow-cli/) [![DUB](https://travis-ci.org/tower1229/Flow-CLI.svg?branch=master)]() [![node](https://img.shields.io/node/v/front-flow-cli.svg)]() [![license](https://img.shields.io/github/license/tower1229/Flow-CLI.svg)]()
 
@@ -39,8 +39,6 @@
 [Flow-CLI Documention](https://tower1229.github.io/Flow-CLI/docs/)
 
 ## 更多
-> 
-[前端路上](http://refined-x.com)
+> [前端路上](http://refined-x.com)
 
-
- 
+<br /><br />
