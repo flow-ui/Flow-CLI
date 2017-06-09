@@ -37,6 +37,5 @@
 
 [Flow-CLI Documention](https://tower1229.github.io/Flow-CLI/docs/)
 
-## License 
-
-GPL-3.0
+## 更多
+> [前端路上](http://refined-x.com)
