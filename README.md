@@ -38,7 +38,7 @@
 
 ## 文档
 
-[Flow-CLI Documention](https://tower1229.github.io/Flow-CLI/docs/)
+[Flow-CLI Documentation](https://tower1229.github.io/Flow-CLI/docs/)
 
 ## 更多
 > [前端路上](http://refined-x.com)
