@@ -6,7 +6,7 @@
 
 [![npm](https://img.shields.io/npm/v/front-flow-cli.svg)](https://www.npmjs.com/package/front-flow-cli/) [![DUB](https://travis-ci.org/tower1229/Flow-CLI.svg?branch=master)]() [![node](https://img.shields.io/node/v/front-flow-cli.svg)]() [![license](https://img.shields.io/github/license/tower1229/Flow-CLI.svg)]()
 
-![preview](https://raw.githubusercontent.com/tower1229/Flow-CLI/master/docs/img/flow-cli-album.png)
+[![logo](https://github.com/tower1229/tower1229.github.io/raw/master/asset/flow-cli-logo.jpg)](http://refined-x.com/Flow-CLI/)
 
 ## 功能
 
@@ -39,6 +39,8 @@
 ## 文档
 
 [Flow-CLI Documentation](https://tower1229.github.io/Flow-CLI/docs/)
+
+![preview](https://raw.githubusercontent.com/tower1229/Flow-CLI/master/docs/img/flow-cli-album.png)
 
 ## 更多
 > [前端路上](http://refined-x.com)
