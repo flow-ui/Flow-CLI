@@ -36,11 +36,26 @@
     <section class="wrap" id="overall">
         <h2>概述</h2>
         <h3 id="overall-intro">关于</h3>
-        <p>Flow-CLI是<a href="https://github.com/tower1229/Flow-UI" target="_blank">Flow-UI</a>的配套命令行工具，实现自动初始化、组件化开发、静态资源编译、静态资源优化、图片压缩等前端自动化需求。</p>
-        <p>典型的<a href="https://github.com/front-flow/front-flow-template" target="_blank">编译模板</a>项目结构如下，其中下划线<code>(_)</code>开头的目录为编译资源，编译后不需要部署到服务器</p>
+        <p>Flow-CLI是<a href="https://github.com/tower1229/Flow-UI" target="_blank">Flow-UI</a>的配套命令行工具，实现自动初始化、组件化开发、静态资源编译、静态资源优化、图片压缩等前端自动化功能。</p>
+        
+        <h3 id="quictStart">快速开始</h3>
+        <h4>安装</h4>
+        <p>1. 安装<a href="https://nodejs.org/en/" target="_blank">nodejs</a>(>=6.5.0)</p>
+        <p>2. 安装Flow-CLI：<code>npm install front-flow-cli -g</code></p>
+        <p>3. 安装完成，查看版本号：<code>flow -V</code></p>
+        <h4>使用</h4>
+        <p><code>flow init</code></p>
+        <p>在当前目录初始化一个<a href="https://github.com/front-flow/front-flow-template" target="_blank">front-flow-template</a>项目</p>
+        <p><code>flow run [configName]</code></p>
+        <p>编译当前项目并启动开发服务，实时编译并刷新浏览器，默认加载配置<code>config.json</code>，可指定配置文件名称</p>
+        <p><code>flow build [configName]</code></p>
+        <p>编译当前项目，默认加载配置<code>config.json</code>，可指定配置文件名称</p>
+        
+        <h3 id="directory">目录结构</h3>
+        <p><a href="https://github.com/front-flow/front-flow-template" target="_blank">默认模板</a>目录结构如下，其中下划线<code>(_)</code>开头的目录为编译资源，不需要部署到服务器，编译产出文件夹（默认"/dist"）和"/modules","/public"需要发布到服务器。</p>
         <pre>
             <code class="javascript"> 
-  |--_component/                //UI组件
+  |--_component/                //框架CSS组件
   |-- _src/                     //源码目录
   |    |-- css/
   |    |-- font/
@@ -51,23 +66,13 @@
   |    |-- index.html
   |    |-- seajs.config.js
   |    `-- favicon.ico 
-  |-- modules/                  //seajs-modules
+  |-- modules/                  //框架JS插件
+  |-- public/                   //公共文件
   `-- config.json               //编译配置
                 </code>
           </pre>
-        <h3 id="getStart">安装</h3>
-        <p>1. 安装<a href="https://nodejs.org/en/" target="_blank">nodejs</a>(>=6.5.0)</p>
-        <p>2. 安装Flow-CLI：<code>npm install front-flow-cli -g</code></p>
-        <p>3. 安装完成，查看版本号：<code>flow -V</code></p>
-        <h3 id="command">命令</h3>
-        <h4>flow init</h4>
-        <p>在当前目录初始化一个<a href="https://github.com/front-flow/front-flow-template" target="_blank">front-flow-template</a>项目</p>
-        <h4>flow build [configName]</h4>
-        <p>编译当前项目，默认加载配置<code>config.json</code>，可指定配置文件名称</p>
-        <h4>flow run [configName]</h4>
-        <p>编译当前项目并启动开发服务，实时编译并刷新浏览器，默认加载配置<code>config.json</code>，可指定配置文件名称</p>
-        <h3 id="setup">配置</h3>
-        编译相关的所有配置均在<code>config.json</code>中：
+        <h3 id="config">配置</h3>
+        <p>编译相关的所有配置均在<code>config.json</code>中：</p>
         <table class="table table-hover">
             <tr>
                 <td>projectDir</td>
@@ -148,7 +153,7 @@
             </tr>
         </table>
     </section>
-    <section class="wrap" id="css">
+    <section class="wrap" id="compile">
         <h2>编译过程</h2>
         <p>编译按<code>script => image => font => html => css</code>顺序进行，各环节支持的格式如下，未包含的格式暂不被支持</p>
         <pre>
@@ -204,8 +209,12 @@ const types = {
         <p>项目里的其他css文件将按原相对路径输出到产出文件夹。</p>
         <p>输出前压缩、加浏览器前缀、替换占位符</p>
     </section>
-    <section class="wrap">
-        <h2 id="other">其他</h2>
+    <section class="wrap" id="community">
+        <h2>社区</h2>
+        <h3 id="blog">博客</h3>
+        <p><a href="http://refined-x.com/">前端技术博客</a></p>
+        <h3 id="community-qq">讨论群</h3>
+        <p><a href="https://jq.qq.com/?_wv=1027&amp;k=5Jx8Wu0" target="_blank" rel="external">361917044</a></p>
         <h3 id="logs">更新日志</h3>
         <div id="versionLogs">
             加载中...
