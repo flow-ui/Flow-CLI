@@ -4,8 +4,8 @@
 define(function(require) {
 	var $ = require('jquery');
 	var base = require('base');
-	
 	/*生成目录*/
+
 	var $nav = $('#nav'),
 		$section = $('section.wrap'),
 		_nav;
@@ -23,49 +23,50 @@ define(function(require) {
 	$nav.html(_nav);
 
 	/*生成模块目录*/
-	var $modMenu = $('#modules_index'),
-		$modItems = $('#modules_list'),
-		_mod;
-	_mod = '<ul class="full-row">';
-	$modItems.find('tr[id]').each(function(i, e) {
-		var _modName = $(e).attr('id');
-		_mod += '<li class="span-4 smal-8"><a href="#' + _modName + '">' + _modName + '</a></li>';
-	});
-	_mod += '</ul>';
-	$modMenu.html(_mod);
-
-	//查看demo
-	$('#modules_list').find('tr').each(function(i, e) {
-			if ($(e).children('td:last').find('pre').length > 1) {
-				$(e).children('td:last').append('<p><a href="javascript:;" target="_blank" class="viewDemo">viewDemo</a></p>');
+	var createNavfromTable = function(nav, table) {
+		var $modMenu = nav,
+			$modItems = table,
+			_mod;
+		_mod = '<ul class="full-row">';
+		$modItems.find('dt[id]').each(function(i, e) {
+			var _modName = $(e).attr('id'),
+				_cont = $(e).next('dd');
+			_mod += '<li class="span-4 smal-6"><a href="#' + encodeURI(_modName) + '" class="el">' + _modName + '</a></li>';
+			//代码预览
+			if (_cont.length && _cont.find('pre').length > 1) {
+				_cont.append('<p><a href="javascript:;" target="_blank" class="LiveDemo"><i class="ion">&#xe668;</i> LiveDemo </a></p>');
 			}
-
-		}).end()
-		.on('click', '.viewDemo', function(e) {
+		}).end().on('click', '.LiveDemo', function(e) {
 			e.preventDefault();
-			window.DemoTitle = $(this).parents('tr').find('td').eq(0).text();
-			window.DemoHtml = $(this).parents('td').find('pre').eq(-2).text();
-			window.DemoJs = $(this).parents('td').find('pre').eq(-1).text();
-			window.open('demo.html');
+			window.DemoTitle = $(this).parents('dd').prev('dt[id]').text();
+			window.DemoHtml = $(this).parents('dd').find('pre').eq(-2).text();
+			window.DemoJs = $(this).parents('dd').find('pre').eq(-1).text();
+			window.open('run.html?page=' + window.DemoTitle);
 		});
+		_mod += '</ul>';
+		$modMenu.html(_mod);
+	};
+
+	createNavfromTable($('#component_index'), $('#component_list'));
+	createNavfromTable($('#modules_index'), $('#modules_list'));
 
 	/*代码着色*/
 	require('copy');
 	require('box');
-	var copybtn = $('<div id="d_clip_button">Copy</div>').appendTo('body');
+	var copybtn = $('<div id="d_clip_button"><i class="ion">&#xe6b5;</i> Copy</div>').appendTo('body');
 	var copyCode = '';
 	copybtn.css({
 		position: 'absolute',
 		padding: '3px 14px',
-		border: '1px solid #ccc',
-		background: '#fff',
 		top: '-999px',
 		zIndex: 999,
-		borderRadius: '3px'
+		color:'#61ce3c',
+		border:'1px solid #61ce3c',
+		borderRadius:'2px'
 	});
 	var showCopyBtn = function(e) {
 		var pre = $(e.target).is('pre') ? $(e.target) : $(e.target).parents('pre');
-		if(!pre.data('oncopy')){
+		if (!pre.data('oncopy')) {
 			copyCode = pre.data('code');
 			copybtn.css({
 				left: pre.offset().left + (pre.outerWidth(true) - copybtn.outerWidth(true)),
@@ -73,13 +74,13 @@ define(function(require) {
 			}).show().zclip('remove').zclip({
 				copy: copyCode,
 				afterCopy: function() {
-					$.box.msg('复制成功',{
-						delay:1000
+					$.box.msg('复制成功', {
+						delay: 1000
 					});
 				}
 			});
-			$('pre').data('oncopy',false);
-			pre.data('oncopy',true);
+			$('pre').data('oncopy', false);
+			pre.data('oncopy', true);
 		}
 	};
 
@@ -87,7 +88,7 @@ define(function(require) {
 		if (base.browser.ie && base.browser.ie < 9) {
 			$.box.msg('您的浏览器版本太低，无法启用代码高亮和demo演示，建议使用chrome或360浏览器。', {
 				color: "danger",
-				delay:3000
+				delay: 3000
 			});
 		} else {
 			require.async('lib/highlight/highlight.pack', function(hl) {
@@ -102,6 +103,10 @@ define(function(require) {
 				$('body').on('mouseenter', 'pre', showCopyBtn);
 			});
 		}
+	}else{
+		//移动端
+		$('pre code').css('display', 'block');
+		$('body').addClass('Mobile');
 	}
 
 	if (window.console) {
@@ -111,6 +116,5 @@ define(function(require) {
 			cons.log("hello, u");
 		}
 	}
-
 
 });
