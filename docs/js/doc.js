@@ -106,7 +106,6 @@ define(function(require) {
 	}else{
 		//移动端
 		$('pre code').css('display', 'block');
-		$('body').addClass('Mobile');
 	}
 
 	if (window.console) {

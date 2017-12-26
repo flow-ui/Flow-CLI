@@ -1,48 +1,52 @@
-<br />
+English | [中文](README_CN.md)
 
 # Flow-CLI
 
-基于Nodejs/Gulp的前端自动化工具
-
 [![npm](https://img.shields.io/npm/v/front-flow-cli.svg)](https://www.npmjs.com/package/front-flow-cli/) [![DUB](https://travis-ci.org/tower1229/Flow-CLI.svg?branch=master)]() [![node](https://img.shields.io/node/v/front-flow-cli.svg)]() [![license](https://img.shields.io/github/license/tower1229/Flow-CLI.svg)]()
+
+> Flow-CLI is an automated tool for Flow-UI development, which realizes automatic front initialization, component-based development, static resource compilation, static resource optimization, image compression and other front-end automation functions.
 
 [![logo](https://github.com/tower1229/tower1229.github.io/raw/master/asset/flow-cli-logo.jpg)](http://refined-x.com/Flow-CLI/)
 
-## 功能
+## Introduction
 
-1. 初始化项目
-2. 构建中部分静态资源合并
-3. 构建中less预编译
-4. 组件化开发
-5. 实时预览服务
-6. 图片压缩
+1. Initialization project
+2. Static resource merger
+3. Less precompilation
+4. Component-based development
+5. Real time preview service
+6. Picture compression
 
-## 安装
+## Documentation
 
-1. 安装nodejs(>=6.5.0)
-2. npm安装：`npm install front-flow-cli -g`
+[Flow-CLI Documentation](https://flow-ui.refined-x.com/Flow-CLI/docs/)
 
-## 命令
+## Setup
+
+1. install nodejs(>=6.5.0)
+2. npm：`npm install front-flow-cli -g`
+
+## Use
 
 ### flow init
 
-在当前目录初始化一个[flow-ui](https://github.com/tower1229/Flow-UI)项目模板
+Initialize a [flow-ui](https://github.com/flow-ui/Flow-UI) project template in the current directory.
 
 ### flow build [configName]
 
-编译当前开发目录，默认加载配置`config.json`，可指定配置文件名称
+Compiling the current development directory, default loading configuration `config.json`, and specifying the name of the configuration file.
 
 ### flow run [configName]
 
-编译并监听开发目录，启动实时预览服务，默认加载配置`config.json`，可指定配置文件名称
+Compile and listen to the development directory, start the real-time preview service, the default load configuration `config.json`, and specify the name of the configuration file.
 
-## 文档
-
-[Flow-CLI Documentation](https://tower1229.github.io/Flow-CLI/docs/)
+## Interface
 
 ![preview](https://raw.githubusercontent.com/tower1229/Flow-CLI/master/docs/img/flow-cli-album.png)
 
-## 更多
-> [前端路上](http://refined-x.com)
+## License
 
-<br /><br />
+[MIT](http://opensource.org/licenses/MIT)
+
+Copyright (c) 2017-present, [refined-x.com](http://refined-x.com)
+
