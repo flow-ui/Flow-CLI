@@ -19,7 +19,7 @@ English | [中文](README_CN.md)
 
 ## Documentation
 
-[Flow-CLI Documentation](https://flow-ui.refined-x.com/Flow-CLI/docs/)
+[Flow-CLI Documentation](http://flow-ui.refined-x.com/Flow-CLI/docs/)
 
 ## Setup
 
