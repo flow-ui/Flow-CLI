@@ -1,6 +1,6 @@
 {
   "name": "front-flow-cli",
-  "version": "3.6.4",
+  "version": "3.6.5",
   "description": "基于Nodejs的前端自动化工具",
   "keywords": [
     "frontend",
@@ -49,6 +49,9 @@
     "node": ">= 6.5.0"
   },
   "logs": [{
+    "version": "3.6.5",
+    "description": "修复非Windows系统下路径处理bug"
+  }, {
     "version": "3.6.4",
     "description": "远程模板url更换"
   }, {

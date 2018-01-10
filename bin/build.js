@@ -24,9 +24,14 @@ const util = require('./util');
 const globalConfig = require('./paths')(process.configName);
 const pkg = require('../package.json');
 const isAbsolute = path.isAbsolute;
+
 if (os.type() === 'Windows_NT') {
 	path = path.win32.posix;
 }
+
+const fixPath = function(filePath){
+	return filePath = filePath.replace(/\\/g, path.sep);
+};
 
 let distHolderFinal = path.format({
 	dir: globalConfig.serverRoot,
@@ -94,7 +99,7 @@ let getWidget = function(widgetName, type, page, isPath) {
 //全局打包缓存
 let packages = {};
 
-const isIncludeReg = /include\\([^\\]+)\\|include\\([^\\\.]+\..+)/;
+const isIncludeReg = /include\/([^\/]+)\/|include\/([^\/\.]+\..+)/;
 const uglifySet = {
 	output: {
 		quote_keys: true
@@ -310,6 +315,7 @@ let script = function(filePath, callback) {
 	spinner.render();
 	//运行中监听
 	if (filePath && filePath.split) {
+		fixPath(filePath);
 		var widgetMatch = filePath.match(isIncludeReg);
 		if (widgetMatch) {
 			if (widgets[widgetMatch[1]]) {
@@ -318,9 +324,9 @@ let script = function(filePath, callback) {
 				return html(widgets[widgetMatch[1]].alise, callback);
 			}
 		} else {
-			if (filePath.indexOf(globalConfig.projectDir + '\\lib\\') === 0 || filePath.indexOf('public\\lib\\seajs\\') === 0 || filePath.indexOf('seajs.config') > -1) {
+			if (filePath.indexOf(globalConfig.projectDir + '\/lib\/') === 0 || filePath.indexOf('public\/lib\/seajs\/') === 0 || filePath.indexOf('seajs.config') > -1) {
 				scriptLib(filePath, callback);
-			} else if (filePath.indexOf(globalConfig.projectDir + '\\js\\') === 0) {
+			} else if (filePath.indexOf(globalConfig.projectDir + '\/js\/') === 0) {
 				scriptApp(filePath, callback);
 			}
 		}
@@ -375,8 +381,8 @@ let css = function(filePath, callback) {
 		}
 	}
 	if (filePath && filePath.split) {
+		fixPath(filePath);
 		let widgetMatch = filePath.match(isIncludeReg);
-		let Path4OS = filePath.replace(/\\/g, path.sep);
 		globalConfig.paths.cssMain.forEach(function(e) {
 			if (Path4OS.indexOf(path.normalize(e)) > -1) {
 				mainTarget = true;
@@ -401,7 +407,8 @@ let css = function(filePath, callback) {
 	if (otherTarget) {
 		let destTarget = globalConfig.distDir;
 		if (otherTarget.split) {
-			let getpathreg = new RegExp(globalConfig.projectDir + '\\\\([^\\\\]+)\\\\.+\\.[^\\.]+');
+			fixPath(otherTarget);
+			let getpathreg = new RegExp(globalConfig.projectDir + '\\/([^\\/]+)\\/.+\\.[^\\.]+');
 			let destmatch = otherTarget.match(getpathreg);
 			if (Array.isArray(destmatch)) {
 				destTarget = path.join(destTarget, destmatch[1]);
@@ -443,6 +450,7 @@ let html = function(filePath, callback) {
 	spinner.render();
 	if (filePath) {
 		if (filePath.split) {
+			fixPath(filePath);
 			var widgetMatch = filePath.match(isIncludeReg);
 			if (widgetMatch) {
 				//1.include
@@ -651,7 +659,8 @@ seajs.use("${x}-inline");
 							mapsrc: './maps',
 							beforeConcat: function(file) {
 								let content = file.contents.toString();
-								let widgetName = file.path.match(isIncludeReg)[1];
+								let filePath = fixPath(file.path);
+								let widgetName = filePath.match(isIncludeReg)[1];
 								content =
 									`define("${widgetName}-inline",function(require, exports, module) {
 			${content}
