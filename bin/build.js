@@ -384,7 +384,7 @@ let css = function(filePath, callback) {
 		fixPath(filePath);
 		let widgetMatch = filePath.match(isIncludeReg);
 		globalConfig.paths.cssMain.forEach(function(e) {
-			if (Path4OS.indexOf(path.normalize(e)) > -1) {
+			if (filePath.indexOf(path.normalize(e)) > -1) {
 				mainTarget = true;
 			}
 		});
