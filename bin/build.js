@@ -30,7 +30,8 @@ if (os.type() === 'Windows_NT') {
 }
 
 const fixPath = function(filePath){
-	return filePath = filePath.replace(/\\/g, path.sep);
+	filePath = filePath.replace(/\\/g, path.sep);
+	return filePath;
 };
 
 let distHolderFinal = path.format({
@@ -315,7 +316,7 @@ let script = function(filePath, callback) {
 	spinner.render();
 	//运行中监听
 	if (filePath && filePath.split) {
-		fixPath(filePath);
+		filePath = fixPath(filePath);
 		var widgetMatch = filePath.match(isIncludeReg);
 		if (widgetMatch) {
 			if (widgets[widgetMatch[1]]) {
@@ -381,7 +382,7 @@ let css = function(filePath, callback) {
 		}
 	}
 	if (filePath && filePath.split) {
-		fixPath(filePath);
+		filePath = fixPath(filePath);
 		let widgetMatch = filePath.match(isIncludeReg);
 		globalConfig.paths.cssMain.forEach(function(e) {
 			if (filePath.indexOf(path.normalize(e)) > -1) {
@@ -407,7 +408,7 @@ let css = function(filePath, callback) {
 	if (otherTarget) {
 		let destTarget = globalConfig.distDir;
 		if (otherTarget.split) {
-			fixPath(otherTarget);
+			otherTarget = fixPath(otherTarget);
 			let getpathreg = new RegExp(globalConfig.projectDir + '\\/([^\\/]+)\\/.+\\.[^\\.]+');
 			let destmatch = otherTarget.match(getpathreg);
 			if (Array.isArray(destmatch)) {
@@ -450,7 +451,7 @@ let html = function(filePath, callback) {
 	spinner.render();
 	if (filePath) {
 		if (filePath.split) {
-			fixPath(filePath);
+			filePath = fixPath(filePath);
 			var widgetMatch = filePath.match(isIncludeReg);
 			if (widgetMatch) {
 				//1.include
