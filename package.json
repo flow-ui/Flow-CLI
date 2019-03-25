@@ -40,8 +40,8 @@
     "gulp-uglify": "^2.0.0",
     "gulp-util": "^3.0.8",
     "less-plugin-autoprefix": "^1.5.1",
-    "npmview": "^0.0.4",
-    "ora": "^2.0.0"
+    "ora": "^2.0.0",
+    "package-json": "^6.2.0"
   },
   "devDependencies": {
     "mocha": "^3.1.2"

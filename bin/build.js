@@ -4,7 +4,7 @@ let path = require('path');
 
 const repl = require('repl');
 const ora = require('ora');
-const npmview = require('npmview');
+const packageJson = require('package-json');
 const gulp = require('gulp');
 const gutil = require('gulp-util');
 const plumber = require('gulp-plumber');
@@ -765,14 +765,12 @@ let build = function(callback) {
 		return startBuild();
 	}
 	spinner.text = '正在检查更新...';
-	npmview(pkg.name, function(err, version, moduleInfo) {
-		let newV = version.split('.'),
+	packageJson(pkg.name).then(function(res) {
+		let version = res.version,
+			newV = version.split('.'),
 			nowV = pkg.version.split('.'),
 			hasUp;
-		if (err) {
-			console.error(err);
-			return startBuild();
-		}
+		
 		newV.forEach(function(e, i) {
 			if (e > nowV[i]) {
 				hasUp = true;
