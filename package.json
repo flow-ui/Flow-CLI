@@ -1,6 +1,6 @@
 {
   "name": "front-flow-cli",
-  "version": "3.6.7",
+  "version": "3.6.9",
   "description": "基于Nodejs的前端自动化工具",
   "keywords": [
     "frontend",
@@ -38,6 +38,7 @@
     "gulp-sourcemaps": "^2.2.0",
     "gulp-tap": "^0.1.3",
     "gulp-uglify": "^2.0.0",
+    "gulp-util": "^3.0.8",
     "less-plugin-autoprefix": "^1.5.1",
     "npmview": "^0.0.4",
     "ora": "^2.0.0"
@@ -48,77 +49,106 @@
   "engines": {
     "node": ">= 6.5.0"
   },
-  "logs": [{
-    "version": "3.6.5/3.6.6/3.6.7",
-    "description": "修复Windows/Linux系统路径分隔符bug"
-  }, {
-    "version": "3.6.4",
-    "description": "远程模板url更换"
-  }, {
-    "version": "3.6.3",
-    "description": "命令行界面优化"
-  }, {
-    "version": "3.6.2",
-    "description": "将public/lib/seajs/**加入监听"
-  }, {
-    "version": "3.6.1",
-    "description": "修复js压缩导致IE8报错bug"
-  }, {
-    "version": "3.6.0",
-    "description": "seajs相关文件从项目内lib/目录移到项目外public/目录"
-  }, {
-    "version": "3.5.0",
-    "description": "增加extendsPath配置，支持添加额外的监听/发布目录"
-  }, {
-    "version": "3.4.0",
-    "description": "命令行增加指定配置文件功能，支持同目录子项目进程多开"
-  }, {
-    "version": "3.3.6",
-    "description": "css文件不再经过编译压缩过程"
-  }, {
-    "version": "3.3.5",
-    "description": "修复当编译到绝对路径时的某些bug"
-  }, {
-    "version": "3.3.4",
-    "description": "css修改不触发编译的bug"
-  }, {
-    "version": "3.3.3",
-    "description": "非压缩模式seajs.config文件也会合并；断网无法启动本地服务bug"
-  }, {
-    "version": "3.3.2",
-    "description": "修改js模块导致开发服务异常中断bug"
-  }, {
-    "version": "3.3.1",
-    "description": "修正windows平台路径分隔符"
-  }, {
-    "version": "3.3.0",
-    "description": "distDir支持绝对路径"
-  }, {
-    "version": "3.2.6",
-    "description": "uuid bug fix；增加编译细节输出"
-  }, {
-    "version": "3.2.5",
-    "description": "bug fix"
-  }, {
-    "version": "3.2.4",
-    "description": "compress=false将保留配置文件原格式输出；组件脚本合并为外链文件，只有一个组件脚本时代码内嵌到页面"
-  }, {
-    "version": "3.2.3",
-    "description": "增加compress配置"
-  }, {
-    "version": "3.2.2",
-    "description": "组件引用bug"
-  }, {
-    "version": "3.2.1",
-    "description": "使用gulp-plumber捕捉css编译流程发生的异常"
-  }, {
-    "version": "3.2.0",
-    "description": "增加__uuid全局变量；组件引用时可以传入数据，并使用_.template编译组件模板"
-  }, {
-    "version": "3.1.4",
-    "description": "增加reloadDelay配置，专治硬盘读写慢的老电脑"
-  }, {
-    "version": "3.1.3",
-    "description": "根路径配置转移到config文件中"
-  }]
+  "logs": [
+    {
+      "version": "3.6.8/3.6.9",
+      "description": "兼容Nodejs-10.x"
+    },
+    {
+      "version": "3.6.5/3.6.6/3.6.7",
+      "description": "修复Windows/Linux系统路径分隔符bug"
+    },
+    {
+      "version": "3.6.4",
+      "description": "远程模板url更换"
+    },
+    {
+      "version": "3.6.3",
+      "description": "命令行界面优化"
+    },
+    {
+      "version": "3.6.2",
+      "description": "将public/lib/seajs/**加入监听"
+    },
+    {
+      "version": "3.6.1",
+      "description": "修复js压缩导致IE8报错bug"
+    },
+    {
+      "version": "3.6.0",
+      "description": "seajs相关文件从项目内lib/目录移到项目外public/目录"
+    },
+    {
+      "version": "3.5.0",
+      "description": "增加extendsPath配置，支持添加额外的监听/发布目录"
+    },
+    {
+      "version": "3.4.0",
+      "description": "命令行增加指定配置文件功能，支持同目录子项目进程多开"
+    },
+    {
+      "version": "3.3.6",
+      "description": "css文件不再经过编译压缩过程"
+    },
+    {
+      "version": "3.3.5",
+      "description": "修复当编译到绝对路径时的某些bug"
+    },
+    {
+      "version": "3.3.4",
+      "description": "css修改不触发编译的bug"
+    },
+    {
+      "version": "3.3.3",
+      "description": "非压缩模式seajs.config文件也会合并；断网无法启动本地服务bug"
+    },
+    {
+      "version": "3.3.2",
+      "description": "修改js模块导致开发服务异常中断bug"
+    },
+    {
+      "version": "3.3.1",
+      "description": "修正windows平台路径分隔符"
+    },
+    {
+      "version": "3.3.0",
+      "description": "distDir支持绝对路径"
+    },
+    {
+      "version": "3.2.6",
+      "description": "uuid bug fix；增加编译细节输出"
+    },
+    {
+      "version": "3.2.5",
+      "description": "bug fix"
+    },
+    {
+      "version": "3.2.4",
+      "description": "compress=false将保留配置文件原格式输出；组件脚本合并为外链文件，只有一个组件脚本时代码内嵌到页面"
+    },
+    {
+      "version": "3.2.3",
+      "description": "增加compress配置"
+    },
+    {
+      "version": "3.2.2",
+      "description": "组件引用bug"
+    },
+    {
+      "version": "3.2.1",
+      "description": "使用gulp-plumber捕捉css编译流程发生的异常"
+    },
+    {
+      "version": "3.2.0",
+      "description": "增加__uuid全局变量；组件引用时可以传入数据，并使用_.template编译组件模板"
+    },
+    {
+      "version": "3.1.4",
+      "description": "增加reloadDelay配置，专治硬盘读写慢的老电脑"
+    },
+    {
+      "version": "3.1.3",
+      "description": "根路径配置转移到config文件中"
+    }
+  ]
 }
