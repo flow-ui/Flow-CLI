@@ -22,7 +22,7 @@
     "flow": "bin/flow.js"
   },
   "dependencies": {
-    "browser-sync": "^2.23.6",
+    "browser-sync": "^2.26.7",
     "chokidar": "^1.6.1",
     "commander": "^2.15.0",
     "del": "^2.2.2",
@@ -44,7 +44,7 @@
     "package-json": "^6.2.0"
   },
   "devDependencies": {
-    "mocha": "^6.0.2"
+    "mocha": "^6.2.0"
   },
   "engines": {
     "node": ">= 6.5.0"
